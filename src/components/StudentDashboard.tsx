@@ -977,44 +977,44 @@ export default function StudentDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border/80 bg-card p-6 sm:p-7 shadow-sm"
+        className="rounded-3xl border border-cyan-500/25 bg-gradient-to-r from-cyan-950/30 via-card/90 to-pink-950/20 p-6 sm:p-7 shadow-[0_4px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl"
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-0.5 text-xs font-semibold text-primary">
-              <GraduationCap className="h-3.5 w-3.5" />
-              Student Learning Hub
+            <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 px-3 py-0.5 text-xs font-semibold text-cyan-300">
+              <GraduationCap className="h-3.5 w-3.5 text-cyan-400" />
+              Student Learning Hub • Retro Fusion
             </p>
 
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               Welcome, {defaultData.student.name}
             </h1>
 
             <p className="mt-1.5 text-sm text-muted-foreground">
               {defaultData.student.className} • Section {defaultData.student.section} • Roll No.{' '}
-              <span className="font-mono text-foreground font-semibold">{defaultData.student.rollNumber}</span>
+              <span className="font-mono text-cyan-300 font-semibold">{defaultData.student.rollNumber}</span>
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             {pendingCount > 0 && (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 min-w-[150px]">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 min-w-[150px]">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                   <AlertCircle className="h-3.5 w-3.5" /> Action Required
                 </p>
-                <p className="mt-1 text-2xl font-bold text-amber-400">
+                <p className="mt-1 text-2xl font-bold text-amber-300">
                   {pendingCount} {pendingCount === 1 ? 'Assignment' : 'Assignments'}
                 </p>
                 <p className="text-xs text-muted-foreground">Pending to answer</p>
               </div>
             )}
 
-            <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5 min-w-[140px]">
+            <div className="rounded-2xl border border-border/80 bg-muted/20 p-3.5 min-w-[140px]">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Attendance</p>
               <p className="mt-1 text-2xl font-bold text-foreground">
                 {defaultData.attendance.present} / {defaultData.attendance.totalClasses}
               </p>
-              <p className="text-xs text-emerald-500">{defaultData.attendance.percentage}% Present</p>
+              <p className="text-xs text-emerald-400">{defaultData.attendance.percentage}% Present</p>
             </div>
           </div>
         </div>
@@ -1272,7 +1272,7 @@ export default function StudentDashboard() {
                       ) : (
                         <Button
                           onClick={() => handleOpenAssignment(assignment, 'answering')}
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs transition-all shadow-sm"
+                          className="w-full bg-gradient-to-r from-cyan-400 via-sky-300 to-pink-400 text-slate-950 font-bold text-xs shadow-[0_0_15px_rgba(0,210,255,0.3)] hover:shadow-[0_0_25px_rgba(0,210,255,0.5)] transition-all"
                           size="sm"
                         >
                           <Sparkles className="mr-1.5 h-3.5 w-3.5" />

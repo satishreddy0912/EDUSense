@@ -10,12 +10,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Space Grotesk', 'Orbitron', 'Inter', 'system-ui', 'sans-serif'],
         base: ['Inter', 'system-ui', 'sans-serif'],
-        tech: ['Inter', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-        syne: ['Inter', 'sans-serif'],
+        tech: ['Orbitron', 'Space Grotesk', 'sans-serif'],
+        mono: ['Share Tech Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        syne: ['Space Grotesk', 'Inter', 'sans-serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -71,6 +71,20 @@ export default {
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
         },
+        retro: {
+          cyan: '#00d2ff',
+          pink: '#ff1a75',
+          amber: '#ffb703',
+          emerald: '#10b981',
+          purple: '#8b5cf6',
+          dark: '#0a0e1f',
+          card: '#11172e',
+        },
+      },
+      boxShadow: {
+        'glow-cyan': '0 0 20px -3px rgba(0, 210, 255, 0.4), inset 0 0 10px -3px rgba(0, 210, 255, 0.1)',
+        'glow-pink': '0 0 20px -3px rgba(255, 26, 117, 0.4), inset 0 0 10px -3px rgba(255, 26, 117, 0.1)',
+        'glow-amber': '0 0 20px -3px rgba(255, 183, 3, 0.4), inset 0 0 10px -3px rgba(255, 183, 3, 0.1)',
       },
       keyframes: {
         'accordion-down': {

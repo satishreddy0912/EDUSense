@@ -557,7 +557,7 @@ export default function StudentAssignmentModal({
                       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                         <Button
                           onClick={() => setMode('review')}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 shadow-sm"
+                          className="bg-gradient-to-r from-cyan-400 via-sky-300 to-pink-400 text-slate-950 font-bold px-6 shadow-[0_0_20px_rgba(0,210,255,0.35)] hover:shadow-[0_0_30px_rgba(0,210,255,0.55)] transition-all"
                         >
                           <FileText className="mr-2 h-4 w-4" />
                           View Detailed Solutions

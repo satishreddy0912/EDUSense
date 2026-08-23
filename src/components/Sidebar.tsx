@@ -10,6 +10,7 @@ import {
   Users,
   ScanFace,
   LogOut,
+  Sparkles,
 } from 'lucide-react';
 
 import { useI18n } from '@/i18n';
@@ -125,33 +126,42 @@ export default function Sidebar({
   });
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r border-border/80 bg-card/95 backdrop-blur-sm lg:w-64">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r border-cyan-500/20 bg-[#0a0e1f]/95 backdrop-blur-xl shadow-[4px_0_30px_rgba(0,0,0,0.5)] lg:w-64">
+      {/* Top Accent Line */}
+      <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-400 via-pink-500 to-amber-400 shadow-[0_0_10px_rgba(0,210,255,0.4)]" />
+
       {/* Logo */}
       <button
         type="button"
         onClick={() => onView('home')}
         className="mt-6 flex items-center gap-3 lg:px-4 group"
       >
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <GraduationCap className="h-6 w-6" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-pink-500 to-amber-400 p-[1.5px] shadow-[0_0_15px_rgba(0,210,255,0.3)] transition-transform group-hover:scale-105">
+          <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0e142c]">
+            <GraduationCap className="h-5 w-5 text-cyan-400" />
+          </div>
         </div>
 
         <div className="hidden text-left lg:block">
           <span className="text-lg font-bold tracking-tight text-foreground">
-            EDUSense
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-pink-400 to-amber-400 font-extrabold">
+              EDU
+            </span>
+            <span className="text-white">SENSE</span>
           </span>
-          <p className="text-xs text-muted-foreground">
-            Learning Platform
+          <p className="font-mono text-[9px] tracking-wider text-cyan-400/80 uppercase">
+            // RETRO.FUSION
           </p>
         </div>
       </button>
 
       {/* Role Pill */}
-      <div className="hidden lg:flex mt-4 w-[calc(100%-2rem)] items-center justify-between px-3 py-1.5 rounded-lg border border-border/80 bg-muted/30 text-xs font-medium text-muted-foreground">
-        <span className="flex items-center gap-2 capitalize">
-          <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-          Role: {role}
+      <div className="hidden lg:flex mt-4 w-[calc(100%-2rem)] items-center justify-between px-3 py-1.5 rounded-lg border border-cyan-500/25 bg-cyan-500/10 font-mono text-[11px] text-cyan-300">
+        <span className="flex items-center gap-1.5 capitalize font-medium">
+          <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_6px_#ffb703] animate-pulse"></span>
+          ROLE: {role}
         </span>
+        <Sparkles className="h-3 w-3 text-cyan-400/70" />
       </div>
 
       {/* Navigation */}
@@ -166,22 +176,39 @@ export default function Sidebar({
               type="button"
               onClick={() => onView(item.id)}
               className={cn(
-                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold tracking-wide transition-all',
                 active
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                  ? 'text-slate-950 font-bold'
+                  : 'text-muted-foreground hover:bg-cyan-500/10 hover:text-cyan-300'
               )}
             >
-              <Icon className="h-4.5 w-4.5 shrink-0" />
+              {active && (
+                <motion.div
+                  layoutId="nav-active"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-300 to-pink-400 shadow-[0_0_20px_rgba(0,210,255,0.45)]"
+                  transition={{
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 30,
+                  }}
+                />
+              )}
 
-              <span className="hidden lg:inline text-xs">
+              <Icon
+                className={cn(
+                  'relative h-4.5 w-4.5 shrink-0 transition-transform group-hover:scale-110',
+                  active ? 'text-slate-950 font-bold' : 'text-cyan-400/80 group-hover:text-cyan-300'
+                )}
+              />
+
+              <span className="relative hidden lg:inline font-sans text-xs">
                 {t(item.labelKey)}
               </span>
 
               <span
                 className={cn(
-                  'ml-auto hidden text-[11px] lg:inline',
-                  active ? 'text-primary-foreground/70' : 'text-muted-foreground/60'
+                  'relative ml-auto hidden font-mono text-[9px] lg:inline',
+                  active ? 'text-slate-950 font-bold' : 'text-muted-foreground/60'
                 )}
               >
                 {item.code}
@@ -196,9 +223,9 @@ export default function Sidebar({
         <button
           type="button"
           onClick={onLogout}
-          className="group flex w-full items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card px-3 py-2 text-xs font-medium text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 lg:justify-start"
+          className="group flex w-full items-center justify-center gap-2.5 rounded-xl border border-pink-500/30 bg-pink-500/10 px-3 py-2 text-xs font-semibold text-pink-300 transition hover:bg-pink-500/20 hover:border-pink-500/50 hover:shadow-[0_0_15px_rgba(255,26,117,0.25)] lg:justify-start"
         >
-          <LogOut className="h-4 w-4 shrink-0" />
+          <LogOut className="h-4 w-4 shrink-0 text-pink-400" />
           <span className="hidden lg:inline">
             Log out
           </span>
