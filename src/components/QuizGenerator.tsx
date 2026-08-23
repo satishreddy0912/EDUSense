@@ -72,6 +72,30 @@ function savePublishedAssessments(assessments: PublishedAssessment[]) {
   window.dispatchEvent(new CustomEvent('edusense-assessments-updated'));
 }
 
+function normalizeDocuments(items: unknown[]): DocumentItem[] {
+  return items
+    .map((item, index) => {
+      const record = item && typeof item === 'object' ? (item as Record<string, unknown>) : null;
+
+      if (!record) {
+        return null;
+      }
+
+      return {
+        id: typeof record.id === 'string' || typeof record.id === 'number' ? String(record.id) : `doc-${index}`,
+        name: typeof record.name === 'string' ? record.name : 'Untitled document',
+        type: typeof record.type === 'string' ? record.type : 'text',
+        subject: typeof record.subject === 'string' ? record.subject : 'General',
+        className: typeof record.className === 'string' ? record.className : 'N/A',
+        chapter: typeof record.chapter === 'string' ? record.chapter : 'General',
+        topic: typeof record.topic === 'string' ? record.topic : 'General',
+        content: typeof record.content === 'string' ? record.content : '',
+        uploadedAt: typeof record.uploadedAt === 'string' ? record.uploadedAt : new Date().toISOString(),
+      } satisfies DocumentItem;
+    })
+    .filter((item): item is DocumentItem => item !== null);
+}
+
 const seed: Question[] = [
  {id:1,type:'MCQ',text:'Which data structure follows the FIFO principle?',answer:'Queue',marks:2,source:'Data Structures lesson'},
  {id:2,type:'True/False',text:'A stack follows the FIFO principle.',answer:'False',marks:1,source:'Data Structures notes'},
@@ -97,17 +121,17 @@ export default function QuizGenerator(){
   Promise.all([api.quizzes.get(),api.documents.list()]).then(([q,d])=>{
    setQuestions(q.questions || seed);
    setAnalytics((prev) => q.analytics || prev);
-   setDocuments(d || []);
+   setDocuments(normalizeDocuments(d || []));
   }).catch(()=>toast.error('Using local demo data — start the backend to sync changes.')).finally(()=>setLoading(false));
  },[]);
 
  const update=(id:number,key:keyof Question,value:string|number)=>{setQuestions(q=>q.map(x=>x.id===id?{...x,[key]:value}:x));api.quizzes.update(id,{[key]:value}).catch(()=>toast.error('Could not sync question'));};
- const add=()=>{const q={type:'MCQ',text:'New question — edit this prompt.',answer:'Answer',marks:1,source:'Teacher material'};api.quizzes.add(q).then(created=>setQuestions(prev=>[...prev,created])).catch(()=>setQuestions(prev=>[...prev,{...q,id:Date.now()}]));};
+ const add=()=>{const q: Question={id: Date.now(),type:'MCQ',text:'New question — edit this prompt.',answer:'Answer',marks:1,source:'Teacher material'};api.quizzes.add(q).then(created=>setQuestions(prev=>[...prev,created])).catch(()=>setQuestions(prev=>[...prev,q]));};
  const generate=async()=>{try{const result=await api.quizzes.generate({subject,className,chapter,topic});setQuestions(result.questions||[]);setGenerated(true);toast.success(`Quiz generated from ${result.sources?.length||0} teacher sources.`);}catch(error: unknown){const message = error instanceof Error ? error.message : 'Upload matching classroom content first.';toast.error(message);}};
  const remove=(id:number)=>{setQuestions(q=>q.filter(x=>x.id!==id));api.quizzes.remove(id).catch(()=>toast.error('Could not sync deletion'));};
  const save=async()=>{try{for(const q of questions) await api.quizzes.update(q.id,q);toast.success('Quiz saved to backend.')}catch{toast.error('Could not save quiz')}};
  const publish=async()=>{try{await save();await api.quizzes.publish();const assessment: PublishedAssessment={id: crypto.randomUUID(),title:`${chapter} • ${topic} Assessment`,subject,className,chapter,topic,teacherName: localStorage.getItem('vidya_auth_name') || 'Teacher',publishedAt:new Date().toISOString(),totalMarks: questions.reduce((sum, question) => sum + Number(question.marks || 0), 0),questions:questions.map((question) => ({ ...question }))};const updatedAssessments=[assessment,...readPublishedAssessments()];savePublishedAssessments(updatedAssessments);toast.success('Quiz published to students.')}catch{toast.error('Could not publish quiz')}};
- const upload=async(file:File)=>{try{const content=await file.text();await api.documents.uploadText({name:file.name,type:file.name.split('.').pop()||'text',content,subject,className,chapter,topic});const d=await api.documents.list();setDocuments(d);toast.success(`${file.name} indexed as teacher-only source.`);}catch(error: unknown){const message = error instanceof Error ? error.message : 'Upload failed. For PDF/PPT, paste extracted lesson text or connect a document parser.';toast.error(message);}};
+ const upload=async(file:File)=>{try{const content=await file.text();await api.documents.uploadText({name:file.name,type:file.name.split('.').pop()||'text',content,subject,className,chapter,topic});const d=await api.documents.list();setDocuments(normalizeDocuments(d || []));toast.success(`${file.name} indexed as teacher-only source.`);}catch(error: unknown){const message = error instanceof Error ? error.message : 'Upload failed. For PDF/PPT, paste extracted lesson text or connect a document parser.';toast.error(message);}};
  const scoreData=[{name:'Attempted',value:analytics.attempted},{name:'Not attempted',value:Math.max(0,100-analytics.attempted)}];
  const scoreBars=[{name:'Average',score:analytics.average},{name:'Highest',score:analytics.highest},{name:'Lowest',score:analytics.lowest},{name:'Pass %',score:analytics.passPercentage}];
  return <div className="space-y-6">
