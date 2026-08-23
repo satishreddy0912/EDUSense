@@ -4,6 +4,7 @@ import {
   useState,
   type ChangeEvent,
 } from 'react';
+
 import { motion } from 'framer-motion';
 
 import {
@@ -50,6 +51,11 @@ import {
   aiInsights,
   lessonAnalytics,
 } from '@/data/mockData';
+
+/*
+  Cross-Sense AI
+*/
+import CrossSensePanel from '@/components/CrossSensePanel';
 
 /* =========================================================
    STORAGE
@@ -282,6 +288,42 @@ export default function TeacherDashboard() {
     tr,
   } = useI18n();
 
+  /* =======================================================
+     CROSS-SENSE AI STATE
+  ======================================================= */
+
+  /*
+    These values are used by the Cross-Sense engine.
+
+    visualActivity:
+      Updated by CameraAssistant.
+
+    audioActivity:
+      Updated by AudioAssistant.
+
+    assessmentScore:
+      Current student/class assessment performance.
+
+    attendance:
+      Current attendance percentage.
+
+    learningGaps:
+      Estimated percentage of learning gaps.
+  */
+
+  const [visualActivity, setVisualActivity] =
+    useState(75);
+
+  const [audioActivity, setAudioActivity] =
+    useState(70);
+
+  const assessmentScore = 82;
+
+  const attendance = 91;
+
+  const learningGaps = 25;
+    
+
   /* -------------------------------------------------------
      VIDEO STATE
   ------------------------------------------------------- */
@@ -317,9 +359,9 @@ export default function TeacherDashboard() {
       'success' | 'error'
     >('success');
 
-  /* -------------------------------------------------------
+  /* =======================================================
      LOAD VIDEOS
-  ------------------------------------------------------- */
+  ======================================================= */
 
   useEffect(() => {
     setVideos(readTeacherVideos());
@@ -366,9 +408,9 @@ export default function TeacherDashboard() {
     };
   }, []);
 
-  /* -------------------------------------------------------
+  /* =======================================================
      VIDEO COUNT
-  ------------------------------------------------------- */
+  ======================================================= */
 
   const videoCountText =
     useMemo(() => {
@@ -379,9 +421,9 @@ export default function TeacherDashboard() {
       return `${videos.length} explanations available to students`;
     }, [videos.length]);
 
-  /* -------------------------------------------------------
+  /* =======================================================
      FILE SELECT
-  ------------------------------------------------------- */
+  ======================================================= */
 
   const handleVideoFile = (
     event: ChangeEvent<HTMLInputElement>
@@ -401,35 +443,24 @@ export default function TeacherDashboard() {
       )
     ) {
       setMessageType('error');
+
       setMessage(
         'Please select a valid video file.'
       );
+
       setVideoFile(null);
+
       return;
     }
 
     setMessage('');
     setVideoFile(file);
-
-    /*
-      Important:
-      Do NOT use URL.createObjectURL()
-      for the saved value.
-
-      Object URLs are temporary and
-      cannot reliably be shared through
-      localStorage.
-
-      The file is converted to a data URL
-      when publishing.
-    */
-
     setVideoUrl('');
   };
 
-  /* -------------------------------------------------------
+  /* =======================================================
      PUBLISH VIDEO
-  ------------------------------------------------------- */
+  ======================================================= */
 
   const addVideoExplanation =
     async () => {
@@ -437,17 +468,21 @@ export default function TeacherDashboard() {
 
       if (!title.trim()) {
         setMessageType('error');
+
         setMessage(
           'Please enter a video title.'
         );
+
         return;
       }
 
       if (!subject.trim()) {
         setMessageType('error');
+
         setMessage(
           'Please enter the subject.'
         );
+
         return;
       }
 
@@ -456,9 +491,11 @@ export default function TeacherDashboard() {
         !videoUrl.trim()
       ) {
         setMessageType('error');
+
         setMessage(
           'Please upload a video or enter a video URL.'
         );
+
         return;
       }
 
@@ -467,12 +504,6 @@ export default function TeacherDashboard() {
       try {
         let finalVideoUrl =
           videoUrl.trim();
-
-        /*
-          If teacher uploaded a file,
-          convert it into a persistent
-          data URL for this demo.
-        */
 
         if (videoFile) {
           finalVideoUrl =
@@ -490,7 +521,7 @@ export default function TeacherDashboard() {
           {
             id:
               typeof crypto !==
-              'undefined' &&
+                'undefined' &&
               typeof crypto.randomUUID ===
                 'function'
                 ? crypto.randomUUID()
@@ -533,8 +564,6 @@ export default function TeacherDashboard() {
           updatedVideos
         );
 
-        /* Reset form */
-
         setTitle('');
         setSubject('');
         setDescription('');
@@ -575,9 +604,9 @@ export default function TeacherDashboard() {
       }
     };
 
-  /* -------------------------------------------------------
+  /* =======================================================
      DELETE VIDEO
-  ------------------------------------------------------- */
+  ======================================================= */
 
   const deleteVideo = (
     id: string
@@ -624,6 +653,11 @@ export default function TeacherDashboard() {
 
   return (
     <div className="min-h-screen space-y-6 pb-12">
+
+      {/* =====================================================
+          HEADER
+      ====================================================== */}
+
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -643,16 +677,31 @@ export default function TeacherDashboard() {
         </p>
       </motion.div>
 
+      {/* =====================================================
+          TEACHER STATISTICS
+      ====================================================== */}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {teacherCards.map((card, index) => {
-          const Icon = iconMap[card.icon] ?? School;
+          const Icon =
+            iconMap[card.icon] ??
+            School;
 
           return (
             <motion.div
               key={card.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.08 }}
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                delay:
+                  index * 0.08,
+              }}
             >
               <Card className="glass p-5 transition hover:border-primary/40">
                 <div className="mb-3 flex items-center justify-between">
@@ -672,7 +721,10 @@ export default function TeacherDashboard() {
                   </span>
                 </div>
 
-                <div className="text-xs text-muted-foreground">{tr(card.label)}</div>
+                <div className="text-xs text-muted-foreground">
+                  {tr(card.label)}
+                </div>
+
                 <div className="font-display text-3xl font-bold">
                   {card.value}
                   {card.suffix ?? ''}
@@ -683,128 +735,284 @@ export default function TeacherDashboard() {
         })}
       </div>
 
+      {/* =====================================================
+          AI INSIGHTS
+      ====================================================== */}
+
       <div className="grid gap-4 lg:grid-cols-3">
-        {aiInsights.map((insight, index) => {
-          const Icon = iconMap[insight.icon] ?? Lightbulb;
+        {aiInsights.map(
+          (insight, index) => {
+            const Icon =
+              iconMap[
+                insight.icon
+              ] ?? Lightbulb;
 
-          return (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={cn('glass border p-5', toneClasses[insight.tone])}>
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-current/10">
-                  <Icon className="h-5 w-5" />
-                </div>
+            return (
+              <motion.div
+                key={index}
+                initial={{
+                  opacity: 0,
+                  y: 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay:
+                    index * 0.1,
+                }}
+              >
+                <Card
+                  className={cn(
+                    'glass border p-5',
+                    toneClasses[
+                      insight.tone
+                    ]
+                  )}
+                >
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-current/10">
+                    <Icon className="h-5 w-5" />
+                  </div>
 
-                <div className="mb-1 text-xs text-muted-foreground">{tr(insight.label)}</div>
-                <div className="font-semibold">{tr(insight.value)}</div>
-              </Card>
-            </motion.div>
-          );
-        })}
+                  <div className="mb-1 text-xs text-muted-foreground">
+                    {tr(
+                      insight.label
+                    )}
+                  </div>
+
+                  <div className="font-semibold">
+                    {tr(
+                      insight.value
+                    )}
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          }
+        )}
       </div>
 
+      {/* =====================================================
+          CROSS-SENSE AI
+      ====================================================== */}
+
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 0.4,
+        }}
+      >
+        <CrossSensePanel
+          visualActivity={
+            visualActivity
+          }
+          audioActivity={
+            audioActivity
+          }
+          assessmentScore={
+            assessmentScore
+          }
+          attendance={
+            attendance
+          }
+          learningGaps={
+            learningGaps
+          }
+          onVisualActivityChange={
+            setVisualActivity
+          }
+          onAudioActivityChange={
+            setAudioActivity
+          }
+        />
+      </motion.div>
+
+      {/* =====================================================
+          TEACHER VIDEO EXPLANATIONS
+      ====================================================== */}
+
       <Card className="glass overflow-hidden border-accent/20">
+
         <div className="bg-gradient-to-r from-accent/10 via-primary/5 to-transparent p-6">
+
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
             <div>
+
               <div className="flex items-center gap-2">
+
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent">
                   <Video className="h-5 w-5" />
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-bold">Teacher Video Explanations</h2>
+
+                  <h2 className="text-xl font-bold">
+                    Teacher Video Explanations
+                  </h2>
+
                   <p className="text-sm text-muted-foreground">
                     Upload explanations for students to watch from their dashboard.
                   </p>
+
                 </div>
+
               </div>
 
               <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+
                 <CheckCircle2 className="h-4 w-4 text-success" />
+
                 {videoCountText}
+
               </div>
+
             </div>
+
           </div>
+
         </div>
 
         <div className="grid gap-6 p-6 lg:grid-cols-2">
+
+          {/* ADD VIDEO */}
+
           <div className="rounded-2xl border border-border/60 bg-muted/10 p-5">
+
             <div className="mb-5 flex items-center gap-2">
+
               <Plus className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">Add Video Explanation</h3>
+
+              <h3 className="font-semibold">
+                Add Video Explanation
+              </h3>
+
             </div>
 
             <div className="space-y-4">
+
               <div>
-                <label htmlFor="video-title" className="mb-1.5 block text-sm font-medium">
+
+                <label
+                  htmlFor="video-title"
+                  className="mb-1.5 block text-sm font-medium"
+                >
                   Video title
                 </label>
+
                 <Input
                   id="video-title"
                   value={title}
-                  onChange={(event) => setTitle(event.target.value)}
+                  onChange={(event) =>
+                    setTitle(
+                      event.target.value
+                    )
+                  }
                   placeholder="Example: Understanding Fractions"
                 />
+
               </div>
 
               <div>
-                <label htmlFor="video-subject" className="mb-1.5 block text-sm font-medium">
+
+                <label
+                  htmlFor="video-subject"
+                  className="mb-1.5 block text-sm font-medium"
+                >
                   Subject
                 </label>
+
                 <Input
                   id="video-subject"
                   value={subject}
-                  onChange={(event) => setSubject(event.target.value)}
+                  onChange={(event) =>
+                    setSubject(
+                      event.target.value
+                    )
+                  }
                   placeholder="Mathematics"
                 />
+
               </div>
 
               <div>
-                <label htmlFor="video-description" className="mb-1.5 block text-sm font-medium">
+
+                <label
+                  htmlFor="video-description"
+                  className="mb-1.5 block text-sm font-medium"
+                >
                   Description
                 </label>
+
                 <Input
                   id="video-description"
                   value={description}
-                  onChange={(event) => setDescription(event.target.value)}
+                  onChange={(event) =>
+                    setDescription(
+                      event.target.value
+                    )
+                  }
                   placeholder="Short explanation summary"
                 />
+
               </div>
 
               <div>
-                <label htmlFor="video-url" className="mb-1.5 block text-sm font-medium">
+
+                <label
+                  htmlFor="video-url"
+                  className="mb-1.5 block text-sm font-medium"
+                >
                   Video URL
                 </label>
+
                 <Input
                   id="video-url"
                   value={videoUrl}
-                  onChange={(event) => setVideoUrl(event.target.value)}
+                  onChange={(event) =>
+                    setVideoUrl(
+                      event.target.value
+                    )
+                  }
                   placeholder="https://example.com/video.mp4"
                 />
+
               </div>
 
               <div>
-                <label htmlFor="teacher-video-file" className="mb-1.5 block text-sm font-medium">
+
+                <label
+                  htmlFor="teacher-video-file"
+                  className="mb-1.5 block text-sm font-medium"
+                >
                   Or upload a video file
                 </label>
+
                 <Input
                   id="teacher-video-file"
                   type="file"
                   accept="video/*"
-                  onChange={handleVideoFile}
+                  onChange={
+                    handleVideoFile
+                  }
                 />
+
               </div>
 
               {message && (
                 <div
                   className={cn(
                     'rounded-xl border px-3 py-2 text-sm',
-                    messageType === 'success'
+                    messageType ===
+                      'success'
                       ? 'border-success/30 bg-success/10 text-success'
                       : 'border-destructive/30 bg-destructive/10 text-destructive'
                   )}
@@ -813,133 +1021,357 @@ export default function TeacherDashboard() {
                 </div>
               )}
 
-              <Button onClick={addVideoExplanation} disabled={isSaving} className="w-full">
-                {isSaving ? 'Publishing...' : 'Publish explanation'}
+              <Button
+                onClick={
+                  addVideoExplanation
+                }
+                disabled={isSaving}
+                className="w-full"
+              >
+                {isSaving
+                  ? 'Publishing...'
+                  : 'Publish explanation'}
               </Button>
+
             </div>
+
           </div>
 
+          {/* STUDENT ACCESS */}
+
           <div className="rounded-2xl border border-border/60 bg-muted/10 p-5">
+
             <div className="mb-5 flex items-center gap-2">
+
               <PlayCircle className="h-5 w-5 text-accent" />
-              <h3 className="font-semibold">Student Access</h3>
+
+              <h3 className="font-semibold">
+                Student Access
+              </h3>
+
             </div>
 
             <div className="space-y-3">
+
               {videos.length === 0 ? (
+
                 <div className="rounded-xl border border-dashed border-border/60 p-4 text-sm text-muted-foreground">
                   No explanations published yet.
                 </div>
+
               ) : (
-                videos.map((video) => (
-                  <div key={video.id} className="rounded-2xl border border-border/60 bg-card/60 p-4">
-                    <div className="mb-2 flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold">{video.title}</p>
-                        <p className="text-xs text-muted-foreground">{video.subject}</p>
+
+                videos.map(
+                  (video) => (
+                    <div
+                      key={
+                        video.id
+                      }
+                      className="rounded-2xl border border-border/60 bg-card/60 p-4"
+                    >
+
+                      <div className="mb-2 flex items-start justify-between gap-3">
+
+                        <div>
+
+                          <p className="font-semibold">
+                            {video.title}
+                          </p>
+
+                          <p className="text-xs text-muted-foreground">
+                            {video.subject}
+                          </p>
+
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() =>
+                            deleteVideo(
+                              video.id
+                            )
+                          }
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+
                       </div>
 
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive"
-                        onClick={() => deleteVideo(video.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        {
+                          video.description
+                        }
+                      </p>
+
+                      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+
+                        <span>
+                          {
+                            video.teacherName
+                          }
+                        </span>
+
+                        <span>
+                          {new Date(
+                            video.createdAt
+                          ).toLocaleDateString()}
+                        </span>
+
+                      </div>
+
+                      {video.videoUrl && (
+                        <a
+                          href={
+                            video.videoUrl
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                          <LinkIcon className="h-4 w-4" />
+                          Open video
+                        </a>
+                      )}
+
                     </div>
+                  )
+                )
 
-                    <p className="text-sm text-muted-foreground">{video.description}</p>
-
-                    <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{video.teacherName}</span>
-                      <span>{new Date(video.createdAt).toLocaleDateString()}</span>
-                    </div>
-
-                    {video.videoUrl && (
-                      <a
-                        href={video.videoUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                        Open video
-                      </a>
-                    )}
-                  </div>
-                ))
               )}
+
             </div>
+
           </div>
+
         </div>
+
       </Card>
 
+      {/* =====================================================
+          LESSON ANALYTICS
+      ====================================================== */}
+
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="glass p-6">
-          <h3 className="mb-4 font-semibold">Lesson Analytics</h3>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={lessonAnalytics}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="lessons" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="assessments" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="reteaching" stroke="hsl(var(--warning))" strokeWidth={2} dot={{ r: 3 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
 
         <Card className="glass p-6">
-          <h3 className="mb-4 font-semibold">Re-Teaching Sessions</h3>
+
+          <h3 className="mb-4 font-semibold">
+            Lesson Analytics
+          </h3>
+
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={lessonAnalytics}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <LineChart
+                data={
+                  lessonAnalytics
+                }
+              >
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="hsl(var(--border))"
+                />
+
+                <XAxis
+                  dataKey="month"
+                  tick={{
+                    fill:
+                      'hsl(var(--muted-foreground))',
+                    fontSize: 11,
+                  }}
+                />
+
+                <YAxis
+                  tick={{
+                    fill:
+                      'hsl(var(--muted-foreground))',
+                    fontSize: 11,
+                  }}
+                />
+
                 <Tooltip />
-                <Bar dataKey="reteaching" fill="hsl(var(--warning))" radius={[8, 8, 0, 0]} />
-              </BarChart>
+
+                <Line
+                  type="monotone"
+                  dataKey="lessons"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="assessments"
+                  stroke="hsl(var(--accent))"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="reteaching"
+                  stroke="hsl(var(--warning))"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+
+              </LineChart>
+
             </ResponsiveContainer>
+
           </div>
+
         </Card>
+
+        {/* =====================================================
+            RE-TEACHING
+        ====================================================== */}
+
+        <Card className="glass p-6">
+
+          <h3 className="mb-4 font-semibold">
+            Re-Teaching Sessions
+          </h3>
+
+          <div className="h-72">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <BarChart
+                data={
+                  lessonAnalytics
+                }
+              >
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="hsl(var(--border))"
+                />
+
+                <XAxis
+                  dataKey="month"
+                  tick={{
+                    fill:
+                      'hsl(var(--muted-foreground))',
+                    fontSize: 11,
+                  }}
+                />
+
+                <YAxis
+                  tick={{
+                    fill:
+                      'hsl(var(--muted-foreground))',
+                    fontSize: 11,
+                  }}
+                />
+
+                <Tooltip />
+
+                <Bar
+                  dataKey="reteaching"
+                  fill="hsl(var(--warning))"
+                  radius={[
+                    8,
+                    8,
+                    0,
+                    0,
+                  ]}
+                />
+
+              </BarChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </Card>
+
       </div>
 
+      {/* =====================================================
+          AI RECOMMENDATIONS
+      ====================================================== */}
+
       <Card className="glass p-6">
+
         <div className="mb-4 flex items-center gap-2">
+
           <Wand2 className="h-5 w-5 text-accent" />
-          <h3 className="font-semibold">AI Recommendations</h3>
+
+          <h3 className="font-semibold">
+            AI Recommendations
+          </h3>
+
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {recommendations.map((recommendation, i) => {
-            const Icon = recommendation.icon;
 
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="rounded-xl border border-border/60 bg-muted/20 p-4 transition hover:border-accent/40"
-              >
-                <Icon className="mb-2 h-5 w-5 text-accent" />
-                <div className="mb-1 text-sm font-semibold">
-                  {lang === 'en' ? recommendation.title : recommendation.titleTe}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {lang === 'en' ? recommendation.desc : recommendation.descTe}
-                </p>
-              </motion.div>
-            );
-          })}
+          {recommendations.map(
+            (
+              recommendation,
+              i
+            ) => {
+
+              const Icon =
+                recommendation.icon;
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={{
+                    opacity: 0,
+                    y: 15,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  transition={{
+                    delay:
+                      i * 0.1,
+                  }}
+                  className="rounded-xl border border-border/60 bg-muted/20 p-4 transition hover:border-accent/40"
+                >
+
+                  <Icon className="mb-2 h-5 w-5 text-accent" />
+
+                  <div className="mb-1 text-sm font-semibold">
+
+                    {lang === 'en'
+                      ? recommendation.title
+                      : recommendation.titleTe}
+
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+
+                    {lang === 'en'
+                      ? recommendation.desc
+                      : recommendation.descTe}
+
+                  </p>
+
+                </motion.div>
+              );
+
+            }
+          )}
+
         </div>
+
       </Card>
+
     </div>
   );
 }
