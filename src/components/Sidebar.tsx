@@ -126,16 +126,16 @@ export default function Sidebar({
   });
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r border-cyan-500/20 bg-[#090b1c]/90 backdrop-blur-2xl shadow-[4px_0_30px_rgba(0,0,0,0.8)] lg:w-64">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r border-cyan-500/20 bg-[#090d22]/90 backdrop-blur-2xl shadow-[4px_0_30px_rgba(0,0,0,0.6)] lg:w-64">
 
-      {/* Retro-Futuristic Logo */}
+      {/* Logo */}
       <button
         type="button"
         onClick={() => onView('home')}
         className="mt-6 flex items-center gap-3 lg:px-4 group"
       >
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-pink-500 p-[1px] shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-transform group-hover:scale-105">
-          <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#090b1c]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-pink-500 p-[1px] shadow-[0_0_15px_rgba(0,210,255,0.35)] transition-transform group-hover:scale-105">
+          <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#0e1329]">
             <svg
               viewBox="0 0 24 24"
               className="h-5 w-5 text-cyan-400"
@@ -163,12 +163,12 @@ export default function Sidebar({
             <span className="text-foreground">SENSE</span>
           </span>
           <p className="font-mono text-[9px] tracking-widest text-cyan-400/70">
-            // CONSOLE.2026
+            // PLATFORM.2026
           </p>
         </div>
       </button>
 
-      {/* Role Telemetry Pill */}
+      {/* Role Pill */}
       <div className="hidden lg:flex mt-4 w-[calc(100%-2rem)] items-center justify-between px-3 py-1.5 rounded-lg border border-cyan-500/20 bg-cyan-500/5 font-mono text-[10px] text-cyan-300">
         <span className="flex items-center gap-1.5 uppercase">
           <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -192,13 +192,13 @@ export default function Sidebar({
                 'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold tracking-wide transition-all',
                 active
                   ? 'text-cyan-950 font-bold'
-                  : 'text-muted-foreground hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-500/20'
+                  : 'text-muted-foreground hover:bg-cyan-500/10 hover:text-cyan-300'
               )}
             >
               {active && (
                 <motion.div
                   layoutId="nav-active"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-300 shadow-[0_0_20px_rgba(0,240,255,0.6)]"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400 to-sky-300 shadow-[0_0_20px_rgba(0,210,255,0.5)]"
                   transition={{
                     type: 'spring',
                     stiffness: 400,
@@ -236,11 +236,11 @@ export default function Sidebar({
         <button
           type="button"
           onClick={onLogout}
-          className="group flex w-full items-center justify-center gap-2.5 rounded-xl border border-pink-500/20 bg-pink-500/5 px-3 py-2 font-mono text-xs text-pink-300 transition hover:border-pink-500/50 hover:bg-pink-500/15 hover:shadow-[0_0_15px_rgba(255,0,127,0.25)] lg:justify-start"
+          className="group flex w-full items-center justify-center gap-2.5 rounded-xl border border-pink-500/20 bg-pink-500/5 px-3 py-2 font-mono text-xs text-pink-300 transition hover:border-pink-500/50 hover:bg-pink-500/15 hover:shadow-[0_0_15px_rgba(255,42,133,0.2)] lg:justify-start"
         >
           <LogOut className="h-4 w-4 shrink-0 text-pink-400" />
           <span className="hidden lg:inline uppercase font-semibold">
-            [ TERMINATE SESSION ]
+            Logout
           </span>
         </button>
 

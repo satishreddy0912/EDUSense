@@ -4,55 +4,55 @@
 
 @layer base {
   :root {
-    /* Retro Futurism Theme: Deep Void Space + Electric Cyber Neon */
-    --background: 245 45% 6%;         /* #070814 */
-    --foreground: 210 100% 98%;        /* #f5f8ff */
-    --card: 245 40% 9%;               /* #0c0e1f */
-    --card-foreground: 210 100% 98%;
-    --popover: 245 40% 9%;
-    --popover-foreground: 210 100% 98%;
+    /* Hybrid Theme: Premium Base Dark SaaS + Cyber Retro-Futurism Accents */
+    --background: 224 45% 7%;          /* Deep Obsidian Navy #080b18 */
+    --foreground: 210 40% 98%;         /* Clean Bright White #f8fafc */
+    --card: 224 40% 11%;               /* Refined Navy Tech Card #0e1329 */
+    --card-foreground: 210 40% 98%;
+    --popover: 224 40% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Neon Electric Cyan */
-    --primary: 185 100% 50%;          /* #00f0ff */
-    --primary-foreground: 245 45% 6%;
+    /* Primary: Electric Cyber Blue/Cyan */
+    --primary: 198 100% 50%;           /* #00d2ff */
+    --primary-foreground: 224 45% 7%;
 
-    /* Deep Indigo / Cyber Slate */
-    --secondary: 245 35% 15%;         /* #181b33 */
-    --secondary-foreground: 185 100% 90%;
+    /* Secondary: Deep Slate Indigo */
+    --secondary: 224 35% 16%;          /* #1a203d */
+    --secondary-foreground: 210 40% 95%;
 
-    /* Muted Slate */
-    --muted: 245 30% 13%;             /* #141629 */
-    --muted-foreground: 225 25% 65%;  /* #8b95b8 */
+    /* Muted Text & Elements */
+    --muted: 224 30% 15%;              /* #171c36 */
+    --muted-foreground: 217 20% 68%;   /* #94a3b8 */
 
-    /* Laser Hot Magenta / Synth Pink */
-    --accent: 335 100% 58%;           /* #ff2a85 */
+    /* Accent: Laser Synth Magenta */
+    --accent: 332 100% 58%;            /* #ff2a85 */
     --accent-foreground: 0 0% 100%;
 
-    /* Cyber Laser Red */
-    --destructive: 350 95% 60%;       /* #ff3355 */
+    /* Laser Red */
+    --destructive: 350 90% 60%;        /* #f43f5e */
     --destructive-foreground: 0 0% 100%;
 
-    /* Phosphor Matrix Emerald */
-    --success: 157 100% 50%;          /* #00ff9d */
-    --success-foreground: 245 45% 6%;
+    /* Matrix Phosphor Green */
+    --success: 155 95% 45%;            /* #10b981 */
+    --success-foreground: 224 45% 7%;
 
-    /* Solar Synth Amber */
-    --warning: 42 100% 50%;           /* #ffb400 */
-    --warning-foreground: 245 45% 6%;
+    /* Solar Amber */
+    --warning: 38 95% 52%;             /* #f59e0b */
+    --warning-foreground: 224 45% 7%;
 
-    /* Neon Borders & Rings */
-    --border: 245 35% 20%;            /* #222648 */
-    --input: 245 35% 18%;
-    --ring: 185 100% 50%;             /* #00f0ff */
+    /* Borders & Rings */
+    --border: 224 32% 20%;             /* #22294f */
+    --input: 224 32% 18%;
+    --ring: 198 100% 50%;              /* #00d2ff */
 
-    /* Data Visualization / Charts */
-    --chart-1: 185 100% 50%;          /* Electric Cyan */
-    --chart-2: 335 100% 58%;          /* Laser Magenta */
-    --chart-3: 157 100% 50%;          /* Matrix Emerald */
-    --chart-4: 42 100% 50%;           /* Solar Amber */
-    --chart-5: 275 100% 65%;          /* Hyper Violet */
+    /* Charts & Data Visualization */
+    --chart-1: 198 100% 50%;           /* Electric Cyan */
+    --chart-2: 332 100% 58%;           /* Synth Magenta */
+    --chart-3: 155 95% 45%;            /* Emerald Green */
+    --chart-4: 38 95% 52%;             /* Solar Amber */
+    --chart-5: 270 90% 65%;            /* Cyber Violet */
 
-    --radius: 0.85rem;
+    --radius: 0.875rem;
   }
 }
 
@@ -64,66 +64,51 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground selection:bg-primary/30 selection:text-primary;
+    @apply bg-background text-foreground selection:bg-primary/25 selection:text-primary;
     font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image: 
-      radial-gradient(ellipse 80% 80% at 50% -20%, rgba(0, 240, 255, 0.12), transparent 70%),
-      radial-gradient(ellipse 60% 60% at 90% 80%, rgba(255, 0, 127, 0.08), transparent 70%),
-      radial-gradient(ellipse 50% 50% at 10% 90%, rgba(0, 255, 157, 0.06), transparent 70%);
+      radial-gradient(ellipse 80% 60% at 50% -15%, rgba(0, 210, 255, 0.10), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 95% 85%, rgba(255, 42, 133, 0.06), transparent 70%),
+      radial-gradient(ellipse 50% 50% at 5% 90%, rgba(16, 185, 129, 0.05), transparent 70%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+    font-family: 'Orbitron', 'Sora', 'Space Grotesk', sans-serif;
     letter-spacing: -0.02em;
   }
 }
 
 @layer utilities {
-  /* Retro Futurism Glass Panels with Cyan & Magenta Neon Rim */
+  /* Hybrid Glass Panels with Cyber Luminescence */
   .glass {
-    @apply bg-[#0c0e1f]/75 backdrop-blur-xl border border-cyan-500/20 shadow-[0_8px_32px_rgba(0,0,0,0.6)];
+    @apply bg-[#0e1329]/80 backdrop-blur-xl border border-cyan-500/15 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
   }
   .glass:hover {
-    @apply border-cyan-500/40 shadow-[0_0_25px_rgba(0,240,255,0.15)];
+    @apply border-cyan-500/35 shadow-[0_0_25px_rgba(0,210,255,0.12)];
   }
   .glass-strong {
-    @apply bg-[#0e1126]/90 backdrop-blur-2xl border border-cyan-400/30 shadow-[0_0_30px_rgba(0,240,255,0.2)];
-  }
-  .glass-magenta {
-    @apply bg-[#150a1e]/80 backdrop-blur-xl border border-pink-500/30 shadow-[0_0_25px_rgba(255,0,127,0.15)];
+    @apply bg-[#101633]/90 backdrop-blur-2xl border border-cyan-400/25 shadow-[0_0_30px_rgba(0,210,255,0.15)];
   }
 
   /* Holographic Gradients */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-pink-500;
-  }
-  .text-gradient-cyan {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-pink-500;
   }
   .text-gradient-accent {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400;
   }
-  .text-gradient-amber {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-orange-400 to-pink-500;
-  }
 
-  /* Neon Glow Effects */
+  /* Cyber Glow Shadows */
   .glow-primary {
-    box-shadow: 0 0 30px -5px rgba(0, 240, 255, 0.6);
+    box-shadow: 0 0 25px -5px rgba(0, 210, 255, 0.5);
   }
   .glow-accent {
-    box-shadow: 0 0 30px -5px rgba(255, 0, 127, 0.6);
-  }
-  .glow-emerald {
-    box-shadow: 0 0 30px -5px rgba(0, 255, 157, 0.6);
-  }
-  .glow-amber {
-    box-shadow: 0 0 30px -5px rgba(255, 180, 0, 0.6);
+    box-shadow: 0 0 25px -5px rgba(255, 42, 133, 0.5);
   }
 
-  /* Tech HUD Card Corner Accents */
+  /* HUD Card Corner Brackets */
   .hud-bracket {
     position: relative;
   }
@@ -136,6 +121,7 @@
     height: 8px;
     border-top: 2px solid hsl(var(--primary));
     border-left: 2px solid hsl(var(--primary));
+    opacity: 0.8;
   }
   .hud-bracket::after {
     content: '';
@@ -146,13 +132,14 @@
     height: 8px;
     border-bottom: 2px solid hsl(var(--accent));
     border-right: 2px solid hsl(var(--accent));
+    opacity: 0.8;
   }
 
-  /* 3D Synthwave Horizon Grid */
+  /* 3D Synth Horizon Grid */
   .retro-grid-perspective {
     background-image: 
-      linear-gradient(to right, rgba(0, 240, 255, 0.15) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+      linear-gradient(to right, rgba(0, 210, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 210, 255, 0.12) 1px, transparent 1px);
     background-size: 40px 40px;
     transform: perspective(600px) rotateX(45deg);
     transform-origin: center top;
@@ -162,18 +149,18 @@
   .retro-scanlines {
     background: linear-gradient(
       rgba(18, 16, 16, 0) 50%, 
-      rgba(0, 0, 0, 0.25) 50%
+      rgba(0, 0, 0, 0.18) 50%
     ), linear-gradient(
       90deg,
-      rgba(255, 0, 0, 0.03),
+      rgba(255, 0, 0, 0.02),
       rgba(0, 255, 0, 0.01),
-      rgba(0, 0, 255, 0.03)
+      rgba(0, 0, 255, 0.02)
     );
     background-size: 100% 3px, 4px 100%;
     pointer-events: none;
   }
 
-  /* Monospace Telemetry Badge */
+  /* Telemetry Badge */
   .telemetry-badge {
     @apply font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-md border border-cyan-500/30 bg-cyan-500/10 text-cyan-300;
   }
@@ -187,20 +174,19 @@
   }
 }
 
-/* Neon Scrollbar */
+/* Sleek Neon Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #070814;
+  background: #080b18;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.3);
+  background: rgba(0, 210, 255, 0.25);
   border-radius: 4px;
-  border: 1px solid rgba(0, 240, 255, 0.2);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 240, 255, 0.7);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+  background: rgba(0, 210, 255, 0.5);
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.6);
 }
