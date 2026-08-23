@@ -21,7 +21,7 @@ import QuizGenerator from '@/components/QuizGenerator';
 import ParentDashboard from '@/components/ParentDashboard';
 import AttendanceDashboard from '@/components/AttendanceDashboard';
 
-type AuthRole = Exclude<PortalRole, 'parent'>;
+type AuthRole = PortalRole;
 
 function getSavedRole(): AuthRole | null {
   const savedRole = localStorage.getItem('vidya_auth_role');
@@ -29,7 +29,8 @@ function getSavedRole(): AuthRole | null {
   if (
     savedRole === 'admin' ||
     savedRole === 'teacher' ||
-    savedRole === 'student'
+    savedRole === 'student' ||
+    savedRole === 'parent'
   ) {
     return savedRole;
   }
@@ -49,6 +50,9 @@ function getInitialView(role: AuthRole): View {
     case 'student':
       return 'student';
 
+    case 'parent':
+      return 'parent';
+
     case 'admin':
     default:
       return 'admin';
@@ -61,6 +65,13 @@ function AppContent() {
     : null;
 
   const [portal, setPortal] = useState<PortalRole | null>(null);
+
+  const [parentAuthenticated, setParentAuthenticated] = useState<boolean>(() => {
+    return (
+      localStorage.getItem('vidya_auth_role') === 'parent' &&
+      localStorage.getItem('vidya_authenticated') === 'true'
+    );
+  });
 
   const [role, setRole] = useState<AuthRole | null>(
     initialRole
@@ -76,7 +87,7 @@ function AppContent() {
     setPortal(selected);
   };
 
-  const handleLogin = (loggedRole: AuthRole) => {
+  const handleLogin = (loggedRole: PortalRole) => {
     localStorage.setItem(
       'vidya_auth_role',
       loggedRole
@@ -86,6 +97,11 @@ function AppContent() {
       'vidya_authenticated',
       'true'
     );
+
+    if (loggedRole === 'parent') {
+      setParentAuthenticated(true);
+      return;
+    }
 
     setRole(loggedRole);
     setPortal(null);
@@ -101,6 +117,7 @@ function AppContent() {
     localStorage.removeItem('vidya_authenticated');
 
     setRole(null);
+    setParentAuthenticated(false);
     setPortal(null);
     setView('home');
   };
@@ -109,27 +126,28 @@ function AppContent() {
      NOT AUTHENTICATED
   ========================================================== */
 
+  if (parentAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background px-6 py-8">
+        <button
+          type="button"
+          onClick={logout}
+          className="mb-4 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          ← Back to portals
+        </button>
+
+        <ParentDashboard />
+      </div>
+    );
+  }
+
   if (!role) {
-    if (portal === 'parent') {
-      return (
-        <div className="min-h-screen bg-background px-6 py-8">
-          <button
-            type="button"
-            onClick={() => setPortal(null)}
-            className="mb-4 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            ← Back to portals
-          </button>
-
-          <ParentDashboard />
-        </div>
-      );
-    }
-
     if (
       portal === 'admin' ||
       portal === 'teacher' ||
-      portal === 'student'
+      portal === 'student' ||
+      portal === 'parent'
     ) {
       return (
         <RoleLogin
@@ -170,6 +188,8 @@ function AppContent() {
 
       case 'student':
         return <StudentDashboard />;
+      case 'parent':
+        return <ParentDashboard />;
 
       case 'admin':
         return <AdminDashboard />;
@@ -180,7 +200,9 @@ function AppContent() {
           ? <TeacherDashboard />
           : getInitialView(role) === 'student'
             ? <StudentDashboard />
-            : <AdminDashboard />;
+            : getInitialView(role) === 'parent'
+              ? <ParentDashboard />
+              : <AdminDashboard />;
     }
   };
 

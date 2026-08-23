@@ -84,7 +84,7 @@ export default function Sidebar({
 }: {
   view: View;
   onView: (v: View) => void;
-  role: 'admin' | 'teacher' | 'student';
+  role: 'admin' | 'teacher' | 'student' | 'parent';
   onLogout: () => void;
 }) {
   const { t } = useI18n();
@@ -96,6 +96,10 @@ export default function Sidebar({
 
     if (role === 'student') {
       return ['student'].includes(item.id);
+    }
+
+    if (role === 'parent') {
+      return ['parent'].includes(item.id);
     }
 
     if (role === 'teacher') {
