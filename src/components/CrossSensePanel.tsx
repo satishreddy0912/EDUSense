@@ -144,10 +144,15 @@ export default function CrossSensePanel({
   const [microphoneStatus, setMicrophoneStatus] =
     useState('Microphone monitoring inactive');
 
+  const [motionIntensity, setMotionIntensity] = useState(0);
+  const [motionState, setMotionState] = useState<'Active Engagement' | 'Attentive Focus' | 'Subtle Movement' | 'Idle / Still'>('Attentive Focus');
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const previousFrameRef = useRef<Uint8ClampedArray | null>(null);
   const cameraAnimRef = useRef<number | null>(null);
+  const smoothedVisualRef = useRef(visualActivity || 75);
+  const lastUpdateTimestampRef = useRef(0);
 
   const cameraStreamRef =
     useRef<MediaStream | null>(null);
@@ -171,12 +176,17 @@ export default function CrossSensePanel({
    */
 
   useEffect(() => {
-    setLiveVisual(clamp(visualActivity));
-  }, [visualActivity]);
+    if (!cameraActive) {
+      setLiveVisual(clamp(visualActivity));
+      smoothedVisualRef.current = clamp(visualActivity);
+    }
+  }, [visualActivity, cameraActive]);
 
   useEffect(() => {
-    setLiveAudio(clamp(audioActivity));
-  }, [audioActivity]);
+    if (!microphoneActive) {
+      setLiveAudio(clamp(audioActivity));
+    }
+  }, [audioActivity, microphoneActive]);
 
   /*
    * =========================================================
@@ -486,6 +496,7 @@ export default function CrossSensePanel({
         cameraAnimRef.current = null;
       }
       previousFrameRef.current = null;
+      setMotionIntensity(0);
       return;
     }
 
@@ -516,21 +527,63 @@ export default function CrossSensePanel({
       const currentFrame = context.getImageData(0, 0, width, height).data;
 
       if (previousFrameRef.current) {
-        let diff = 0;
+        let activePixels = 0;
+        let totalDelta = 0;
+        const totalPixels = width * height;
+
         for (let i = 0; i < currentFrame.length; i += 4) {
-          diff +=
+          const delta =
             Math.abs(currentFrame[i] - previousFrameRef.current[i]) +
             Math.abs(currentFrame[i + 1] - previousFrameRef.current[i + 1]) +
             Math.abs(currentFrame[i + 2] - previousFrameRef.current[i + 2]);
+
+          // Filter camera digital sensor noise (threshold = 24)
+          if (delta > 24) {
+            activePixels += 1;
+            totalDelta += delta;
+          }
         }
 
-        const avgDiff = diff / (width * height * 3);
-        const computedActivity = Math.round(
-          Math.min(100, Math.max(30, avgDiff * 8 + 45)),
-        );
+        const motionFraction = activePixels / totalPixels;
+        const motionScore = Math.min(100, Math.round(motionFraction * 500));
 
-        setLiveVisual(computedActivity);
-        onVisualActivityChange?.(computedActivity);
+        // Adaptive target visual engagement based on human movement in frame
+        let targetEngagement = 72; // baseline attentive focus
+        if (motionFraction > 0.08) {
+          // Dynamic movement (hand gestures, speaking, active participation)
+          targetEngagement = clamp(Math.round(86 + Math.min(12, motionFraction * 90)));
+        } else if (motionFraction > 0.015) {
+          // Subtle movement (head motion, blinking, writing)
+          targetEngagement = clamp(Math.round(74 + motionFraction * 140));
+        } else {
+          // Very still / resting
+          targetEngagement = 64;
+        }
+
+        // Exponential Moving Average filter for liquid-smooth transitions
+        smoothedVisualRef.current =
+          smoothedVisualRef.current * 0.84 + targetEngagement * 0.16;
+
+        const finalScore = clamp(Math.round(smoothedVisualRef.current));
+        const now = performance.now();
+
+        // Throttle React state dispatches to ~10 FPS for max performance & no UI lag
+        if (now - lastUpdateTimestampRef.current > 100) {
+          lastUpdateTimestampRef.current = now;
+          setLiveVisual(finalScore);
+          onVisualActivityChange?.(finalScore);
+          setMotionIntensity(motionScore);
+
+          if (finalScore >= 80) {
+            setMotionState('Active Engagement');
+          } else if (finalScore >= 68) {
+            setMotionState('Attentive Focus');
+          } else if (finalScore >= 52) {
+            setMotionState('Subtle Movement');
+          } else {
+            setMotionState('Idle / Still');
+          }
+        }
       }
 
       previousFrameRef.current = new Uint8ClampedArray(currentFrame);
@@ -1310,27 +1363,126 @@ export default function CrossSensePanel({
                     autoPlay
                     muted
                     playsInline
-                    className="h-44 w-full object-cover"
+                    className="h-48 w-full object-cover"
                   />
-                  <div className="absolute top-2 left-2 flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-medium text-emerald-400 backdrop-blur-sm">
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-[11px] font-semibold text-emerald-400 backdrop-blur-md border border-emerald-500/30">
                     <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-                    LIVE CAMERA FEED
+                    LIVE OPTICAL FEED
+                  </div>
+
+                  <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-[11px] font-medium text-white/90 backdrop-blur-md">
+                    <Activity className="h-3 w-3 text-primary animate-pulse" />
+                    {motionState}
                   </div>
                 </div>
               )}
               <canvas ref={canvasRef} className="hidden" />
 
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  Visual activity
-                </span>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Visual Activity Level
+                    </span>
+                    {cameraActive && (
+                      <span className={cn(
+                        'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                        analysis.visual >= 75
+                          ? 'bg-emerald-500/15 text-emerald-500'
+                          : analysis.visual >= 55
+                          ? 'bg-amber-500/15 text-amber-500'
+                          : 'bg-rose-500/15 text-rose-500'
+                      )}>
+                        {motionState}
+                      </span>
+                    )}
+                  </div>
 
-                <span className="font-bold text-primary">
-                  {Math.round(
-                    analysis.visual,
-                  )}
-                  %
-                </span>
+                  <span className={cn(
+                    'font-bold font-display text-base',
+                    analysis.visual >= 75
+                      ? 'text-emerald-500'
+                      : analysis.visual >= 55
+                      ? 'text-amber-500'
+                      : 'text-rose-500'
+                  )}>
+                    {Math.round(analysis.visual)}%
+                  </span>
+                </div>
+
+                {/* Animated Activity Progress Bar */}
+                <div className="h-2.5 overflow-hidden rounded-full bg-muted/60">
+                  <div
+                    className={cn(
+                      'h-full rounded-full transition-all duration-300',
+                      analysis.visual >= 75
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                        : analysis.visual >= 55
+                        ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
+                        : 'bg-gradient-to-r from-rose-500 to-red-400'
+                    )}
+                    style={{
+                      width: `${analysis.visual}%`,
+                    }}
+                  />
+                </div>
+
+                {/* Quick Calibration / Preset Buttons when Camera is Inactive */}
+                {!cameraActive && (
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
+                      <span>Quick Signal Calibration:</span>
+                      <span className="text-primary font-medium">Manual Mode</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLiveVisual(88);
+                          onVisualActivityChange?.(88);
+                        }}
+                        className={cn(
+                          'rounded-lg px-2 py-1 text-[11px] font-medium transition border',
+                          Math.round(analysis.visual) >= 80
+                            ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-muted/40 border-border/60 hover:bg-muted text-muted-foreground'
+                        )}
+                      >
+                        High Focus (88%)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLiveVisual(72);
+                          onVisualActivityChange?.(72);
+                        }}
+                        className={cn(
+                          'rounded-lg px-2 py-1 text-[11px] font-medium transition border',
+                          Math.round(analysis.visual) >= 60 && Math.round(analysis.visual) < 80
+                            ? 'bg-amber-500/15 border-amber-500/40 text-amber-600 dark:text-amber-400'
+                            : 'bg-muted/40 border-border/60 hover:bg-muted text-muted-foreground'
+                        )}
+                      >
+                        Normal (72%)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLiveVisual(45);
+                          onVisualActivityChange?.(45);
+                        }}
+                        className={cn(
+                          'rounded-lg px-2 py-1 text-[11px] font-medium transition border',
+                          Math.round(analysis.visual) < 60
+                            ? 'bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400'
+                            : 'bg-muted/40 border-border/60 hover:bg-muted text-muted-foreground'
+                        )}
+                      >
+                        Low Focus (45%)
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

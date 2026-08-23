@@ -124,7 +124,11 @@ export const api = {
     remove: (id: number) => request<ApiRecord>(`/quizzes/${id}`, { method: 'DELETE' }),
     publish: () => request<ApiRecord>('/quizzes/publish', { method: 'POST' }),
   },
-  student: () => request<ApiRecord>('/student/dashboard'),
+  student: {
+    dashboard: () => request<ApiRecord>('/student/dashboard'),
+    assignments: () => request<ApiRecord[]>('/student/assignments'),
+    submitAssignment: (payload: ApiRecord) => request<ApiRecord>('/student/assignments', { method: 'POST', body: JSON.stringify(payload) }),
+  },
   insights: () => request<ApiRecord>('/student/insights'),
   notifications: () => request<ApiRecord[]>('/notifications'),
   lessons: {

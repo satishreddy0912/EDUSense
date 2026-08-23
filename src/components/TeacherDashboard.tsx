@@ -25,6 +25,8 @@ import {
   PlayCircle,
   Link as LinkIcon,
   CheckCircle2,
+  X,
+  ExternalLink,
 } from 'lucide-react';
 
 import {
@@ -53,9 +55,13 @@ import {
 } from '@/data/mockData';
 
 /*
-  Cross-Sense AI
+  Cross-Sense AI & Visual Activity Modals
 */
 import CrossSensePanel from '@/components/CrossSensePanel';
+import VisualFractionStripsModal from '@/components/VisualFractionStripsModal';
+import TeacherRecommendationsModal, {
+  type RecommendationType,
+} from '@/components/TeacherRecommendationsModal';
 
 /* =========================================================
    STORAGE
@@ -115,6 +121,7 @@ const toneClasses: Record<string, string> = {
 
 const recommendations = [
   {
+    type: 'worksheet' as const,
     icon: FileText,
     title: 'Worksheet',
     titleTe: 'వర్క్‌షీట్',
@@ -122,8 +129,11 @@ const recommendations = [
       'Adding fractions — 20 problems, auto-generated',
     descTe:
       'భిన్నాల సంకలనం — 20 సమస్యలు',
+    actionLabel: 'Generate & Print',
+    actionLabelTe: 'జనరేట్ & ప్రింట్',
   },
   {
+    type: 'remedial' as const,
     icon: Sparkles,
     title: 'Remedial Activity',
     titleTe: 'ప్రతివిధి కార్యకలాపం',
@@ -131,8 +141,12 @@ const recommendations = [
       'Fraction strips hands-on exercise',
     descTe:
       'భిన్నం పట్టీల ఆచరణీయ వ్యాయామం',
+    actionLabel: 'Launch Visual Activity',
+    actionLabelTe: 'దృశ్య కార్యాచరణ ప్రారంభించండి',
+    highlight: true,
   },
   {
+    type: 'homework' as const,
     icon: BookOpen,
     title: 'Homework',
     titleTe: 'హోంవర్క్',
@@ -140,8 +154,11 @@ const recommendations = [
       'Daily 5 fraction problems with solutions',
     descTe:
       'రోజుకు 5 భిన్నం సమస్యలు',
+    actionLabel: 'View & Assign',
+    actionLabelTe: 'చూడండి & కేటాయించండి',
   },
   {
+    type: 'group' as const,
     icon: UsersRound,
     title: 'Group Activity',
     titleTe: 'సమూహ కార్యకలాపం',
@@ -149,6 +166,8 @@ const recommendations = [
       'Pizza fraction puzzle in teams of 4',
     descTe:
       'పిజ్జా భిన్నం పజిల్ — 4 జట్టులు',
+    actionLabel: 'Start Group Puzzle',
+    actionLabelTe: 'గ్రూప్ పజిల్ ప్రారంభించండి',
   },
 ];
 
@@ -358,6 +377,29 @@ export default function TeacherDashboard() {
     useState<
       'success' | 'error'
     >('success');
+
+  /* -------------------------------------------------------
+     MODALS & INTERACTIVE ACTIVITY STATE
+  ------------------------------------------------------- */
+
+  const [isVisualModalOpen, setIsVisualModalOpen] =
+    useState(false);
+
+  const [recommendationModalType, setRecommendationModalType] =
+    useState<RecommendationType>(null);
+
+  const [toastMessage, setToastMessage] =
+    useState<string | null>(null);
+
+  const handleRecommendationClick = (
+    type: 'worksheet' | 'remedial' | 'homework' | 'group'
+  ) => {
+    if (type === 'remedial') {
+      setIsVisualModalOpen(true);
+    } else {
+      setRecommendationModalType(type);
+    }
+  };
 
   /* =======================================================
      LOAD VIDEOS
@@ -661,21 +703,60 @@ export default function TeacherDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
       >
-        <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <span className="rounded-full bg-primary/15 px-3 py-1 text-primary">
-            {t('nav.teacher')}
-          </span>
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <span className="rounded-full bg-primary/15 px-3 py-1 text-primary font-semibold">
+              {t('nav.teacher')}
+            </span>
+            <span className="rounded-full bg-accent/15 px-3 py-1 text-accent font-semibold flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Visual Activities Ready
+            </span>
+          </div>
+
+          <h1 className="font-display text-3xl font-bold sm:text-4xl">
+            AI Control Center
+          </h1>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            Premium teaching intelligence dashboard with interactive visual activities
+          </p>
         </div>
 
-        <h1 className="font-display text-3xl font-bold sm:text-4xl">
-          AI Control Center
-        </h1>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          Premium teaching intelligence dashboard
-        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setIsVisualModalOpen(true)}
+            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_20px_rgba(0,210,255,0.35)] transition-all font-semibold"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Launch Visual Activity
+          </Button>
+        </div>
       </motion.div>
+
+      {/* TOAST NOTIFICATION BANNER */}
+      {toastMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/15 p-4 text-sm text-emerald-300 shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+        >
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+            <span className="font-medium">{toastMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToastMessage(null)}
+            className="text-emerald-400 hover:text-emerald-200"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </motion.div>
+      )}
 
       {/* =====================================================
           TEACHER STATISTICS
@@ -747,6 +828,12 @@ export default function TeacherDashboard() {
                 insight.icon
               ] ?? Lightbulb;
 
+            const isSuggestedVisualActivity =
+              index === 2 ||
+              (typeof insight.value === 'object' &&
+                'en' in insight.value &&
+                insight.value.en.includes('fraction strips'));
+
             return (
               <motion.div
                 key={index}
@@ -764,13 +851,29 @@ export default function TeacherDashboard() {
                 }}
               >
                 <Card
+                  onClick={
+                    isSuggestedVisualActivity
+                      ? () => setIsVisualModalOpen(true)
+                      : undefined
+                  }
                   className={cn(
-                    'glass border p-5',
+                    'glass border p-5 transition relative overflow-hidden',
                     toneClasses[
                       insight.tone
-                    ]
+                    ],
+                    isSuggestedVisualActivity &&
+                      'cursor-pointer hover:border-primary/60 hover:shadow-[0_0_25px_rgba(0,210,255,0.25)] hover:scale-[1.01]'
                   )}
                 >
+                  {isSuggestedVisualActivity && (
+                    <div className="absolute top-3 right-3">
+                      <span className="flex items-center gap-1 rounded-full bg-primary/20 border border-primary/40 px-2 py-0.5 text-[10px] font-bold text-primary animate-pulse">
+                        <Sparkles className="h-2.5 w-2.5" />
+                        Click to Launch
+                      </span>
+                    </div>
+                  )}
+
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-current/10">
                     <Icon className="h-5 w-5" />
                   </div>
@@ -781,11 +884,18 @@ export default function TeacherDashboard() {
                     )}
                   </div>
 
-                  <div className="font-semibold">
+                  <div className="font-semibold text-foreground">
                     {tr(
                       insight.value
                     )}
                   </div>
+
+                  {isSuggestedVisualActivity && (
+                    <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-primary">
+                      <span>Open Interactive Fraction Strips</span>
+                      <PlayCircle className="h-3.5 w-3.5" />
+                    </div>
+                  )}
                 </Card>
               </motion.div>
             );
@@ -1305,13 +1415,19 @@ export default function TeacherDashboard() {
 
       <Card className="glass p-6">
 
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
 
-          <Wand2 className="h-5 w-5 text-accent" />
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-5 w-5 text-accent" />
 
-          <h3 className="font-semibold">
-            AI Recommendations
-          </h3>
+            <h3 className="font-semibold text-lg">
+              AI Recommendations & Interventions
+            </h3>
+          </div>
+
+          <span className="text-xs text-muted-foreground">
+            Click any recommendation below to launch the interactive workspace
+          </span>
 
         </div>
 
@@ -1325,6 +1441,9 @@ export default function TeacherDashboard() {
 
               const Icon =
                 recommendation.icon;
+
+              const isRemedial =
+                recommendation.type === 'remedial';
 
               return (
                 <motion.div
@@ -1341,26 +1460,64 @@ export default function TeacherDashboard() {
                     delay:
                       i * 0.1,
                   }}
-                  className="rounded-xl border border-border/60 bg-muted/20 p-4 transition hover:border-accent/40"
+                  onClick={() =>
+                    handleRecommendationClick(
+                      recommendation.type
+                    )
+                  }
+                  className={cn(
+                    'rounded-2xl border p-5 transition cursor-pointer flex flex-col justify-between group relative overflow-hidden',
+                    isRemedial
+                      ? 'border-primary/50 bg-gradient-to-b from-primary/15 via-muted/20 to-muted/10 hover:border-primary hover:shadow-[0_0_30px_rgba(0,210,255,0.25)]'
+                      : 'border-border/60 bg-muted/20 hover:border-accent/50 hover:bg-muted/30 hover:shadow-md'
+                  )}
                 >
 
-                  <Icon className="mb-2 h-5 w-5 text-accent" />
+                  {isRemedial && (
+                    <div className="absolute top-2.5 right-2.5">
+                      <span className="rounded-full bg-primary/20 border border-primary/40 px-2 py-0.5 text-[10px] font-bold text-primary">
+                        FEATURED
+                      </span>
+                    </div>
+                  )}
 
-                  <div className="mb-1 text-sm font-semibold">
+                  <div>
+                    <div
+                      className={cn(
+                        'mb-3 flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110',
+                        isRemedial
+                          ? 'bg-primary/20 text-primary'
+                          : 'bg-accent/15 text-accent'
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
 
-                    {lang === 'en'
-                      ? recommendation.title
-                      : recommendation.titleTe}
+                    <div className="mb-1 text-sm font-bold text-white">
 
+                      {lang === 'en'
+                        ? recommendation.title
+                        : recommendation.titleTe}
+
+                    </div>
+
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+
+                      {lang === 'en'
+                        ? recommendation.desc
+                        : recommendation.descTe}
+
+                    </p>
                   </div>
 
-                  <p className="text-xs text-muted-foreground">
-
-                    {lang === 'en'
-                      ? recommendation.desc
-                      : recommendation.descTe}
-
-                  </p>
+                  <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs font-semibold">
+                    <span className={cn(isRemedial ? 'text-primary' : 'text-accent')}>
+                      {lang === 'en'
+                        ? recommendation.actionLabel
+                        : recommendation.actionLabelTe}
+                    </span>
+                    <PlayCircle className={cn('h-4 w-4 transition-transform group-hover:translate-x-1', isRemedial ? 'text-primary' : 'text-accent')} />
+                  </div>
 
                 </motion.div>
               );
@@ -1371,6 +1528,29 @@ export default function TeacherDashboard() {
         </div>
 
       </Card>
+
+      {/* =====================================================
+          VISUAL ACTIVITY & RECOMMENDATION MODALS
+      ====================================================== */}
+
+      <VisualFractionStripsModal
+        isOpen={isVisualModalOpen}
+        onClose={() => setIsVisualModalOpen(false)}
+        onAssignToStudents={(title) => {
+          setToastMessage(`"${title}" has been assigned to students successfully!`);
+          setTimeout(() => setToastMessage(null), 5000);
+        }}
+      />
+
+      <TeacherRecommendationsModal
+        type={recommendationModalType}
+        isOpen={recommendationModalType !== null}
+        onClose={() => setRecommendationModalType(null)}
+        onAssign={(_type, title) => {
+          setToastMessage(`"${title}" has been assigned to students successfully!`);
+          setTimeout(() => setToastMessage(null), 5000);
+        }}
+      />
 
     </div>
   );

@@ -126,7 +126,8 @@ function getInitialDb() {
       { id: 'n1', title: 'New Quiz Published', body: 'Chapter 4 AI & Search Algorithms quiz is now live.', time: '10 mins ago', read: false },
       { id: 'n2', title: 'Attendance Alert', body: 'Attendance recorded: Present for all scheduled classes today.', time: '2 hours ago', read: true }
     ],
-    handRaises: []
+    handRaises: [],
+    studentSubmissions: []
   };
 }
 
@@ -616,6 +617,31 @@ export async function handleRequest(req, res) {
         focusAreas: sorted.slice(-2).map(s => s.name),
         generatedAt: new Date().toISOString()
       });
+    }
+
+    if (p === '/api/student/assignments' && req.method === 'GET') {
+      const db = load();
+      return json(res, 200, db.studentSubmissions || []);
+    }
+
+    if (p === '/api/student/assignments' && req.method === 'POST') {
+      const body = await parseBody(req);
+      const db = load();
+      const submission = {
+        id: body.id || `sub-${Date.now()}`,
+        assignmentId: body.assignmentId,
+        score: body.score,
+        totalMarks: body.totalMarks,
+        percentage: body.percentage,
+        grade: body.grade,
+        submittedAt: body.submittedAt || new Date().toISOString(),
+        studentAnswers: body.studentAnswers || {},
+        questionResults: body.questionResults || [],
+        feedback: body.feedback || ''
+      };
+      db.studentSubmissions = [submission, ...(db.studentSubmissions || []).filter(s => s.assignmentId !== body.assignmentId)];
+      save(db);
+      return json(res, 200, { success: true, submission });
     }
 
     if (p === '/api/notifications' && req.method === 'GET') {
