@@ -4,53 +4,61 @@
 
 @layer base {
   :root {
-    /* Hybrid Theme: Premium Base Dark SaaS + Cyber Retro-Futurism Accents */
-    --background: 224 45% 7%;          /* Deep Obsidian Navy #080b18 */
-    --foreground: 210 40% 98%;         /* Clean Bright White #f8fafc */
-    --card: 224 40% 11%;               /* Refined Navy Tech Card #0e1329 */
-    --card-foreground: 210 40% 98%;
-    --popover: 224 40% 11%;
-    --popover-foreground: 210 40% 98%;
+    /* =========================================================
+       CYBERPUNK 2077 DESIGN SYSTEM
+       - Void Obsidian Background: #050814
+       - Neon Cyan: #00f0ff (hsl(186, 100%, 50%))
+       - Laser Hot Pink / Magenta: #ff0055 (hsl(340, 100%, 50%))
+       - Cyberpunk Electric Yellow: #ffe600 (hsl(54, 100%, 50%))
+       - Matrix Toxic Green: #00ff66 (hsl(144, 100%, 50%))
+       - Glitch Violet: #9d00ff (hsl(277, 100%, 50%))
+    ========================================================= */
+    --background: 228 60% 5%;          /* #050814 - Deep Void Dark */
+    --foreground: 180 100% 98%;        /* #f0ffff - Ultra Bright Cyan-White */
+    --card: 228 50% 9%;                /* #0b0f24 - Cyber Obsidian Panel */
+    --card-foreground: 180 100% 98%;
+    --popover: 228 50% 9%;
+    --popover-foreground: 180 100% 98%;
 
-    /* Primary: Electric Cyber Blue/Cyan */
-    --primary: 198 100% 50%;           /* #00d2ff */
-    --primary-foreground: 224 45% 7%;
+    /* Primary: Iconic Cyberpunk Neon Cyan */
+    --primary: 186 100% 50%;           /* #00f0ff */
+    --primary-foreground: 228 60% 5%;
 
-    /* Secondary: Deep Slate Indigo */
-    --secondary: 224 35% 16%;          /* #1a203d */
-    --secondary-foreground: 210 40% 95%;
+    /* Secondary: Deep Cyber Slate Indigo */
+    --secondary: 228 40% 15%;          /* #161b38 */
+    --secondary-foreground: 186 100% 90%;
 
-    /* Muted Text & Elements */
-    --muted: 224 30% 15%;              /* #171c36 */
-    --muted-foreground: 217 20% 68%;   /* #94a3b8 */
+    /* Muted Elements */
+    --muted: 228 35% 13%;              /* #131730 */
+    --muted-foreground: 215 25% 65%;   /* #8ba0b8 */
 
-    /* Accent: Laser Synth Magenta */
-    --accent: 332 100% 58%;            /* #ff2a85 */
+    /* Accent: Laser Hot Magenta / Pink */
+    --accent: 340 100% 50%;            /* #ff0055 */
     --accent-foreground: 0 0% 100%;
 
-    /* Laser Red */
-    --destructive: 350 90% 60%;        /* #f43f5e */
+    /* Destructive: Cyber Red */
+    --destructive: 350 100% 55%;        /* #ff1a40 */
     --destructive-foreground: 0 0% 100%;
 
-    /* Matrix Phosphor Green */
-    --success: 155 95% 45%;            /* #10b981 */
-    --success-foreground: 224 45% 7%;
+    /* Success: Matrix Phosphor Green */
+    --success: 144 100% 50%;           /* #00ff66 */
+    --success-foreground: 228 60% 5%;
 
-    /* Solar Amber */
-    --warning: 38 95% 52%;             /* #f59e0b */
-    --warning-foreground: 224 45% 7%;
+    /* Warning: Cyber Electric Yellow */
+    --warning: 54 100% 50%;            /* #ffe600 */
+    --warning-foreground: 228 60% 5%;
 
-    /* Borders & Rings */
-    --border: 224 32% 20%;             /* #22294f */
-    --input: 224 32% 18%;
-    --ring: 198 100% 50%;              /* #00d2ff */
+    /* Borders & Rings with Neon Resonance */
+    --border: 228 40% 20%;             /* #1f274a */
+    --input: 228 40% 16%;
+    --ring: 186 100% 50%;              /* #00f0ff */
 
     /* Charts & Data Visualization */
-    --chart-1: 198 100% 50%;           /* Electric Cyan */
-    --chart-2: 332 100% 58%;           /* Synth Magenta */
-    --chart-3: 155 95% 45%;            /* Emerald Green */
-    --chart-4: 38 95% 52%;             /* Solar Amber */
-    --chart-5: 270 90% 65%;            /* Cyber Violet */
+    --chart-1: 186 100% 50%;           /* Neon Cyan */
+    --chart-2: 340 100% 50%;           /* Laser Magenta */
+    --chart-3: 54 100% 50%;            /* Cyber Yellow */
+    --chart-4: 144 100% 50%;           /* Matrix Green */
+    --chart-5: 277 100% 50%;           /* Glitch Violet */
 
     --radius: 0.875rem;
   }
@@ -64,105 +72,136 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground selection:bg-primary/25 selection:text-primary;
+    @apply bg-background text-foreground selection:bg-primary/30 selection:text-primary;
     font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #050814;
     background-image: 
-      radial-gradient(ellipse 80% 60% at 50% -15%, rgba(0, 210, 255, 0.10), transparent 70%),
-      radial-gradient(ellipse 60% 50% at 95% 85%, rgba(255, 42, 133, 0.06), transparent 70%),
-      radial-gradient(ellipse 50% 50% at 5% 90%, rgba(16, 185, 129, 0.05), transparent 70%);
+      radial-gradient(ellipse 85% 65% at 50% -15%, rgba(0, 240, 255, 0.12), transparent 75%),
+      radial-gradient(ellipse 65% 55% at 95% 85%, rgba(255, 0, 85, 0.08), transparent 75%),
+      radial-gradient(ellipse 55% 55% at 5% 90%, rgba(255, 230, 0, 0.06), transparent 75%),
+      linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', 'Sora', 'Space Grotesk', sans-serif;
+    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
     letter-spacing: -0.02em;
   }
 }
 
 @layer utilities {
-  /* Hybrid Glass Panels with Cyber Luminescence */
+  /* =========================================================
+     CYBERPUNK HUD PANELS & GLASS
+  ========================================================= */
   .glass {
-    @apply bg-[#0e1329]/80 backdrop-blur-xl border border-cyan-500/15 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
+    @apply bg-[#0b0f24]/85 backdrop-blur-xl border border-cyan-500/20 shadow-[0_8px_32px_rgba(0,0,0,0.6)];
   }
   .glass:hover {
-    @apply border-cyan-500/35 shadow-[0_0_25px_rgba(0,210,255,0.12)];
+    @apply border-cyan-400/40 shadow-[0_0_30px_rgba(0,240,255,0.2)];
   }
   .glass-strong {
-    @apply bg-[#101633]/90 backdrop-blur-2xl border border-cyan-400/25 shadow-[0_0_30px_rgba(0,210,255,0.15)];
+    @apply bg-[#0e132e]/90 backdrop-blur-2xl border border-cyan-400/30 shadow-[0_0_35px_rgba(0,240,255,0.2)];
+  }
+
+  /* Cyber Card with Chamfered Tech Edge */
+  .cyber-card {
+    @apply relative bg-[#0b0f24]/90 border border-cyan-500/30 rounded-2xl backdrop-blur-xl shadow-[0_0_25px_rgba(0,240,255,0.1)] transition-all;
+  }
+  .cyber-card:hover {
+    @apply border-cyan-400 shadow-[0_0_35px_rgba(0,240,255,0.25)] -translate-y-0.5;
   }
 
   /* Holographic Gradients */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-pink-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-yellow-300 to-pink-500;
   }
-  .text-gradient-accent {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400;
+  .text-gradient-cyan {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400;
+  }
+  .text-gradient-pink {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-rose-400 to-amber-300;
+  }
+  .text-gradient-yellow {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400;
   }
 
   /* Cyber Glow Shadows */
-  .glow-primary {
-    box-shadow: 0 0 25px -5px rgba(0, 210, 255, 0.5);
+  .glow-cyan {
+    box-shadow: 0 0 25px -3px rgba(0, 240, 255, 0.5), inset 0 0 15px -3px rgba(0, 240, 255, 0.2);
   }
-  .glow-accent {
-    box-shadow: 0 0 25px -5px rgba(255, 42, 133, 0.5);
+  .glow-pink {
+    box-shadow: 0 0 25px -3px rgba(255, 0, 85, 0.5), inset 0 0 15px -3px rgba(255, 0, 85, 0.2);
+  }
+  .glow-yellow {
+    box-shadow: 0 0 25px -3px rgba(255, 230, 0, 0.5), inset 0 0 15px -3px rgba(255, 230, 0, 0.2);
+  }
+  .glow-green {
+    box-shadow: 0 0 25px -3px rgba(0, 255, 102, 0.5), inset 0 0 15px -3px rgba(0, 255, 102, 0.2);
   }
 
-  /* HUD Card Corner Brackets */
+  /* Cyber HUD Corner Brackets */
   .hud-bracket {
     position: relative;
   }
   .hud-bracket::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    border-top: 2px solid hsl(var(--primary));
-    border-left: 2px solid hsl(var(--primary));
-    opacity: 0.8;
+    top: -2px;
+    left: -2px;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid #00f0ff;
+    border-left: 2px solid #00f0ff;
+    filter: drop-shadow(0 0 4px #00f0ff);
   }
   .hud-bracket::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
-    border-bottom: 2px solid hsl(var(--accent));
-    border-right: 2px solid hsl(var(--accent));
-    opacity: 0.8;
+    bottom: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-bottom: 2px solid #ff0055;
+    border-right: 2px solid #ff0055;
+    filter: drop-shadow(0 0 4px #ff0055);
   }
 
-  /* 3D Synth Horizon Grid */
+  /* Cyber Perspective 3D Grid */
   .retro-grid-perspective {
     background-image: 
-      linear-gradient(to right, rgba(0, 210, 255, 0.12) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 210, 255, 0.12) 1px, transparent 1px);
+      linear-gradient(to right, rgba(0, 240, 255, 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
     background-size: 40px 40px;
-    transform: perspective(600px) rotateX(45deg);
+    transform: perspective(600px) rotateX(55deg);
     transform-origin: center top;
   }
 
-  /* Subtle CRT Scanline overlay */
+  /* CRT Scanlines */
   .retro-scanlines {
     background: linear-gradient(
       rgba(18, 16, 16, 0) 50%, 
-      rgba(0, 0, 0, 0.18) 50%
+      rgba(0, 0, 0, 0.22) 50%
     ), linear-gradient(
       90deg,
-      rgba(255, 0, 0, 0.02),
-      rgba(0, 255, 0, 0.01),
-      rgba(0, 0, 255, 0.02)
+      rgba(255, 0, 85, 0.03),
+      rgba(0, 240, 255, 0.02),
+      rgba(255, 230, 0, 0.02)
     );
     background-size: 100% 3px, 4px 100%;
     pointer-events: none;
   }
 
-  /* Telemetry Badge */
+  /* Telemetry Cyber Badge */
   .telemetry-badge {
-    @apply font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-md border border-cyan-500/30 bg-cyan-500/10 text-cyan-300;
+    @apply font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-lg border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.2)];
+  }
+
+  /* Cyber Button */
+  .cyber-btn {
+    @apply relative overflow-hidden font-bold tracking-wider uppercase transition-all duration-200;
   }
 
   .scrollbar-hide::-webkit-scrollbar {
@@ -174,19 +213,20 @@
   }
 }
 
-/* Sleek Neon Scrollbar */
+/* Neon Cyber Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #080b18;
+  background: #050814;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 210, 255, 0.25);
+  background: rgba(0, 240, 255, 0.35);
   border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 210, 255, 0.5);
-  box-shadow: 0 0 10px rgba(0, 210, 255, 0.6);
+  background: #00f0ff;
+  box-shadow: 0 0 15px #00f0ff;
 }

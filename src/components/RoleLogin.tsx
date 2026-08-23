@@ -172,14 +172,14 @@ export default function RoleLogin({
       : password.length === 0);
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080b18] px-6 py-12">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050814] px-6 py-12">
       {/* Background Grid */}
-      <div className="absolute inset-x-0 bottom-0 h-96 retro-grid-perspective opacity-20 pointer-events-none" />
-      <div className="absolute inset-0 retro-scanlines opacity-30 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-96 retro-grid-perspective opacity-30 pointer-events-none" />
+      <div className="absolute inset-0 retro-scanlines opacity-40 pointer-events-none" />
 
       {/* Cyber Lights */}
-      <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-cyan-500/15 blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-pink-500/15 blur-[140px] pointer-events-none" />
+      <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-cyan-500/20 blur-[150px] pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-pink-500/20 blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
         <Button
@@ -385,11 +385,11 @@ export default function RoleLogin({
                 {/* Login Button */}
                 <Button
                   type="submit"
-                  className="w-full font-display text-xs font-bold tracking-wider uppercase bg-gradient-to-r from-cyan-500 via-sky-500 to-pink-500 text-white shadow-[0_0_20px_rgba(0,210,255,0.3)] hover:shadow-[0_0_30px_rgba(0,210,255,0.5)] transition disabled:opacity-50"
+                  className="w-full font-display text-xs font-black tracking-wider uppercase bg-gradient-to-r from-cyan-400 via-sky-300 to-yellow-300 text-slate-950 shadow-[0_0_25px_rgba(0,240,255,0.4)] hover:shadow-[0_0_35px_rgba(0,240,255,0.6)] hover:scale-[1.02] transition disabled:opacity-50"
                   disabled={isSubmitDisabled}
                 >
                   <LogIn className="mr-2 h-4 w-4" />
-                  {loading ? 'Signing in...' : 'Login'}
+                  {loading ? 'INITIALIZING NEURAL SESSION...' : 'INITIALIZE ACCESS'}
                 </Button>
               </form>
             </CardContent>

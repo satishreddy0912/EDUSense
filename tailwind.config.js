@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Orbitron', 'Sora', 'Space Grotesk', 'system-ui', 'sans-serif'],
+        display: ['Orbitron', 'Space Grotesk', 'system-ui', 'sans-serif'],
         base: ['Inter', 'system-ui', 'sans-serif'],
         tech: ['Orbitron', 'sans-serif'],
         mono: ['Share Tech Mono', 'JetBrains Mono', 'monospace'],
@@ -71,12 +71,24 @@ export default {
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
         },
+        // Cyberpunk direct color utilities
+        cyber: {
+          cyan: '#00f0ff',
+          pink: '#ff0055',
+          yellow: '#ffe600',
+          green: '#00ff66',
+          purple: '#9d00ff',
+          dark: '#050814',
+          card: '#0b0f24',
+          border: '#1f274a',
+        },
       },
       boxShadow: {
-        'glow-cyan': '0 0 25px -3px rgba(0, 210, 255, 0.45), inset 0 0 15px -3px rgba(0, 210, 255, 0.15)',
-        'glow-magenta': '0 0 25px -3px rgba(255, 42, 133, 0.45), inset 0 0 15px -3px rgba(255, 42, 133, 0.15)',
-        'glow-amber': '0 0 25px -3px rgba(255, 180, 0, 0.45), inset 0 0 15px -3px rgba(255, 180, 0, 0.15)',
-        'glow-emerald': '0 0 25px -3px rgba(0, 255, 157, 0.45), inset 0 0 15px -3px rgba(0, 255, 157, 0.15)',
+        'glow-cyan': '0 0 25px -3px rgba(0, 240, 255, 0.5), inset 0 0 15px -3px rgba(0, 240, 255, 0.2)',
+        'glow-pink': '0 0 25px -3px rgba(255, 0, 85, 0.5), inset 0 0 15px -3px rgba(255, 0, 85, 0.2)',
+        'glow-yellow': '0 0 25px -3px rgba(255, 230, 0, 0.5), inset 0 0 15px -3px rgba(255, 230, 0, 0.2)',
+        'glow-green': '0 0 25px -3px rgba(0, 255, 102, 0.5), inset 0 0 15px -3px rgba(0, 255, 102, 0.2)',
+        'glow-purple': '0 0 25px -3px rgba(157, 0, 255, 0.5), inset 0 0 15px -3px rgba(157, 0, 255, 0.2)',
       },
       keyframes: {
         'accordion-down': {
@@ -92,8 +104,8 @@ export default {
           '100%': { backgroundPosition: '200% 0' },
         },
         'pulse-glow': {
-          '0%, 100%': { opacity: '0.4', filter: 'drop-shadow(0 0 8px rgba(0,210,255,0.3))' },
-          '50%': { opacity: '0.9', filter: 'drop-shadow(0 0 18px rgba(0,210,255,0.6))' },
+          '0%, 100%': { opacity: '0.4', filter: 'drop-shadow(0 0 8px rgba(0,240,255,0.3))' },
+          '50%': { opacity: '0.9', filter: 'drop-shadow(0 0 18px rgba(0,240,255,0.7))' },
         },
         'float': {
           '0%, 100%': { transform: 'translateY(0px)' },
@@ -118,8 +130,8 @@ export default {
         'grid-travel': 'grid-travel 2s linear infinite',
       },
       backgroundImage: {
-        'grid-pattern': "linear-gradient(to right, rgba(0, 210, 255, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 210, 255, 0.08) 1px, transparent 1px)",
-        'cyber-grid': "radial-gradient(circle, rgba(0,210,255,0.12) 1px, transparent 1px)",
+        'grid-pattern': "linear-gradient(to right, rgba(0, 240, 255, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 240, 255, 0.08) 1px, transparent 1px)",
+        'cyber-grid': "radial-gradient(circle, rgba(0,240,255,0.15) 1px, transparent 1px)",
       },
     },
   },
