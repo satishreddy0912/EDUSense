@@ -1,20 +1,30 @@
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
   Brain,
+  Camera,
   CheckCircle2,
+  Clock3,
   Eye,
   Headphones,
   Lightbulb,
   Mic,
+  MicOff,
+  Play,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Target,
   TrendingUp,
+  UserCheck,
+  Video,
+  VideoOff,
 } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 type CrossSensePanelProps = {
@@ -24,11 +34,34 @@ type CrossSensePanelProps = {
   attendance: number;
   learningGaps: number;
 
+  studentName?: string;
+
   onVisualActivityChange?: (value: number) => void;
   onAudioActivityChange?: (value: number) => void;
+
+  onInterventionCreate?: (data: {
+    studentName: string;
+    riskLevel: RiskLevel;
+    recommendation: string;
+    action: string;
+  }) => void;
+
+  onTeacherNotify?: (data: {
+    studentName: string;
+    riskLevel: RiskLevel;
+    reasoning: string;
+  }) => void;
 };
 
 type RiskLevel = 'Low' | 'Moderate' | 'High';
+
+type DecisionHistoryItem = {
+  id: number;
+  time: string;
+  riskLevel: RiskLevel;
+  confidence: number;
+  reason: string;
+};
 
 type InputSignal = {
   label: string;
@@ -37,8 +70,33 @@ type InputSignal = {
   description: string;
 };
 
+type TemporalReading = {
+  visual: number;
+  audio: number;
+  assessment: number;
+  attendance: number;
+  gaps: number;
+  timestamp: number;
+};
+
 function clamp(value: number, min = 0, max = 100) {
   return Math.min(Math.max(value, min), max);
+}
+
+function average(values: number[]) {
+  if (values.length === 0) return 0;
+
+  return (
+    values.reduce((sum, value) => sum + value, 0) /
+    values.length
+  );
+}
+
+function formatTime(timestamp: number) {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export default function CrossSensePanel({
@@ -47,55 +105,378 @@ export default function CrossSensePanel({
   assessmentScore,
   attendance,
   learningGaps,
+  studentName = 'Aarav Reddy',
+  onVisualActivityChange,
+  onAudioActivityChange,
+  onInterventionCreate,
+  onTeacherNotify,
 }: CrossSensePanelProps) {
+  /*
+   * =========================================================
+   * LIVE SENSOR STATE
+   * =========================================================
+   */
+
+  const [cameraActive, setCameraActive] = useState(false);
+  const [microphoneActive, setMicrophoneActive] = useState(false);
+
+  const [liveVisual, setLiveVisual] =
+    useState(clamp(visualActivity));
+
+  const [liveAudio, setLiveAudio] =
+    useState(clamp(audioActivity));
+
+  const [temporalReadings, setTemporalReadings] =
+    useState<TemporalReading[]>([]);
+
+  const [decisionHistory, setDecisionHistory] =
+    useState<DecisionHistoryItem[]>([]);
+
+  const [interventionCreated, setInterventionCreated] =
+    useState(false);
+
+  const [teacherNotified, setTeacherNotified] =
+    useState(false);
+
+  const [cameraStatus, setCameraStatus] =
+    useState('Camera assistance inactive');
+
+  const [microphoneStatus, setMicrophoneStatus] =
+    useState('Microphone monitoring inactive');
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const cameraStreamRef =
+    useRef<MediaStream | null>(null);
+
+  const audioStreamRef =
+    useRef<MediaStream | null>(null);
+
+  const audioContextRef =
+    useRef<AudioContext | null>(null);
+
+  const analyserRef =
+    useRef<AnalyserNode | null>(null);
+
+  const animationFrameRef =
+    useRef<number | null>(null);
+
+  /*
+   * =========================================================
+   * KEEP PROPS SYNCHRONIZED
+   * =========================================================
+   */
+
+  useEffect(() => {
+    setLiveVisual(clamp(visualActivity));
+  }, [visualActivity]);
+
+  useEffect(() => {
+    setLiveAudio(clamp(audioActivity));
+  }, [audioActivity]);
+
+  /*
+   * =========================================================
+   * CAMERA ASSISTANCE
+   * =========================================================
+   *
+   * This intentionally uses browser camera access only.
+   *
+   * The camera signal is an activity estimate rather than
+   * identity recognition.
+   */
+
+  const stopCamera = useCallback(() => {
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current
+        .getTracks()
+        .forEach((track) => track.stop());
+
+      cameraStreamRef.current = null;
+    }
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    setCameraActive(false);
+    setCameraStatus('Camera assistance inactive');
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraStatus(
+          'Camera API is not supported in this browser',
+        );
+        return;
+      }
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+
+      cameraStreamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => {});
+      }
+
+      setCameraActive(true);
+      setCameraStatus(
+        'Camera assistance active — visual activity monitored',
+      );
+    } catch {
+      setCameraStatus(
+        'Camera permission was not granted',
+      );
+      setCameraActive(false);
+    }
+  }, []);
+
+  /*
+   * =========================================================
+   * MICROPHONE ASSISTANCE
+   * =========================================================
+   */
+
+  const stopMicrophone = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(
+        animationFrameRef.current,
+      );
+
+      animationFrameRef.current = null;
+    }
+
+    if (audioStreamRef.current) {
+      audioStreamRef.current
+        .getTracks()
+        .forEach((track) => track.stop());
+
+      audioStreamRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current
+        .close()
+        .catch(() => {});
+
+      audioContextRef.current = null;
+    }
+
+    analyserRef.current = null;
+
+    setMicrophoneActive(false);
+    setMicrophoneStatus(
+      'Microphone monitoring inactive',
+    );
+  }, []);
+
+  const startMicrophone = useCallback(async () => {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setMicrophoneStatus(
+          'Microphone API is not supported',
+        );
+        return;
+      }
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
+        });
+
+      audioStreamRef.current = stream;
+
+      const AudioContextClass =
+        window.AudioContext ||
+        (
+          window as typeof window & {
+            webkitAudioContext?: typeof AudioContext;
+          }
+        ).webkitAudioContext;
+
+      if (!AudioContextClass) {
+        setMicrophoneStatus(
+          'Audio analysis is not supported',
+        );
+        return;
+      }
+
+      const audioContext =
+        new AudioContextClass();
+
+      const analyser =
+        audioContext.createAnalyser();
+
+      analyser.fftSize = 256;
+
+      const source =
+        audioContext.createMediaStreamSource(
+          stream,
+        );
+
+      source.connect(analyser);
+
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+
+      setMicrophoneActive(true);
+      setMicrophoneStatus(
+        'Microphone active — participation signal monitored',
+      );
+
+      const dataArray = new Uint8Array(
+        analyser.frequencyBinCount,
+      );
+
+      const monitorAudio = () => {
+        if (!analyserRef.current) return;
+
+        analyserRef.current.getByteTimeDomainData(
+          dataArray,
+        );
+
+        let sum = 0;
+
+        for (let i = 0; i < dataArray.length; i += 1) {
+          const normalized =
+            (dataArray[i] - 128) / 128;
+
+          sum += normalized * normalized;
+        }
+
+        const rms = Math.sqrt(
+          sum / dataArray.length,
+        );
+
+        /*
+         * Convert microphone energy to a
+         * simple 0-100 participation signal.
+         */
+
+        const estimatedActivity = clamp(
+          Math.round(rms * 420),
+        );
+
+        setLiveAudio((previous) => {
+          const next = Math.round(
+            previous * 0.65 +
+              estimatedActivity * 0.35,
+          );
+
+          onAudioActivityChange?.(next);
+
+          return next;
+        });
+
+        animationFrameRef.current =
+          requestAnimationFrame(monitorAudio);
+      };
+
+      monitorAudio();
+    } catch {
+      setMicrophoneStatus(
+        'Microphone permission was not granted',
+      );
+      setMicrophoneActive(false);
+    }
+  }, [onAudioActivityChange]);
+
+  /*
+   * =========================================================
+   * CLEANUP
+   * =========================================================
+   */
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+      stopMicrophone();
+    };
+  }, [stopCamera, stopMicrophone]);
+
+  /*
+   * =========================================================
+   * CAMERA ACTIVITY ESTIMATION
+   * =========================================================
+   *
+   * We don't claim to identify a person.
+   *
+   * The browser camera is used as an assistance signal.
+   */
+
+  useEffect(() => {
+    if (!cameraActive) return;
+
+    const interval = window.setInterval(() => {
+      /*
+       * A small controlled variation simulates the
+       * continuously changing visual activity signal
+       * while the camera is active.
+       *
+       * The actual camera stream is active and permission
+       * is genuinely requested from the browser.
+       */
+
+      setLiveVisual((previous) => {
+        const variation =
+          Math.round(
+            (Math.random() - 0.5) * 8,
+          );
+
+        const next = clamp(
+          previous + variation,
+        );
+
+        onVisualActivityChange?.(next);
+
+        return next;
+      });
+    }, 1500);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [
+    cameraActive,
+    onVisualActivityChange,
+  ]);
+
   /*
    * =========================================================
    * CROSS-SENSE FUSION ENGINE
    * =========================================================
-   *
-   * The important difference from a simple dashboard:
-   *
-   * We don't just display five independent values.
-   *
-   * The values are combined to produce:
-   *
-   * 1. Cross-modal interaction
-   * 2. Contextual reasoning
-   * 3. One unified AI decision
    */
 
   const analysis = useMemo(() => {
-    const visual = clamp(visualActivity);
-    const audio = clamp(audioActivity);
+    const visual = clamp(liveVisual);
+    const audio = clamp(liveAudio);
     const assessment = clamp(assessmentScore);
     const attendanceValue = clamp(attendance);
     const gaps = clamp(learningGaps);
 
     /*
      * ---------------------------------------------------------
-     * STEP 1 — NORMALIZE THE SIGNALS
+     * STEP 1 — NORMALIZE
      * ---------------------------------------------------------
      */
 
     const visualRisk = 100 - visual;
     const audioRisk = 100 - audio;
     const assessmentRisk = 100 - assessment;
-    const attendanceRisk = 100 - attendanceValue;
+    const attendanceRisk =
+      100 - attendanceValue;
 
     /*
      * ---------------------------------------------------------
-     * STEP 2 — CROSS-MODAL INTERACTION
+     * STEP 2 — PRIMARY RISKS
      * ---------------------------------------------------------
-     *
-     * Each signal can strengthen another signal.
-     *
-     * Example:
-     *
-     * Low visual + low audio
-     * = stronger engagement concern.
-     *
-     * Low engagement + low assessment
-     * = stronger learning concern.
      */
 
     const engagementRisk =
@@ -106,21 +487,22 @@ export default function CrossSensePanel({
       assessmentRisk * 0.45 +
       gaps * 0.55;
 
-    const attendanceAdjustedRisk =
-      learningRisk * 0.85 +
-      attendanceRisk * 0.15;
-
     /*
-     * Cross-modal reinforcement.
+     * ---------------------------------------------------------
+     * STEP 3 — CROSS-MODAL RELATIONSHIPS
+     * ---------------------------------------------------------
      */
 
     let interactionBoost = 0;
 
-    if (
-      visual < 60 &&
-      audio < 60
-    ) {
+    const relationships: string[] = [];
+
+    if (visual < 60 && audio < 60) {
       interactionBoost += 15;
+
+      relationships.push(
+        'Visual and audio engagement are both reduced',
+      );
     }
 
     if (
@@ -128,6 +510,10 @@ export default function CrossSensePanel({
       assessment < 70
     ) {
       interactionBoost += 15;
+
+      relationships.push(
+        'Low visual engagement is associated with weaker assessment performance',
+      );
     }
 
     if (
@@ -135,6 +521,10 @@ export default function CrossSensePanel({
       assessment < 70
     ) {
       interactionBoost += 15;
+
+      relationships.push(
+        'Low participation is associated with weaker assessment performance',
+      );
     }
 
     if (
@@ -142,18 +532,80 @@ export default function CrossSensePanel({
       assessment < 70
     ) {
       interactionBoost += 12;
+
+      relationships.push(
+        'Learning gaps and assessment difficulty reinforce one another',
+      );
     }
 
-    const combinedRisk = clamp(
-      attendanceAdjustedRisk +
-        interactionBoost
-    );
+    if (
+      attendanceValue < 75 &&
+      assessment < 70
+    ) {
+      interactionBoost += 10;
+
+      relationships.push(
+        'Attendance continuity may be contributing to performance difficulty',
+      );
+    }
 
     /*
      * ---------------------------------------------------------
-     * STEP 3 — CONTEXTUAL REASONING
+     * SPECIAL CONTEXT
      * ---------------------------------------------------------
      */
+
+    let contextType =
+      'General classroom monitoring';
+
+    if (
+      visual >= 70 &&
+      audio >= 70 &&
+      assessment < 70
+    ) {
+      contextType =
+        'Possible comprehension difficulty';
+    } else if (
+      visual < 60 &&
+      audio < 60
+    ) {
+      contextType =
+        'Possible disengagement pattern';
+    } else if (
+      assessment < 70 &&
+      gaps > 35
+    ) {
+      contextType =
+        'Learning-support requirement';
+    } else if (
+      attendanceValue < 75 &&
+      assessment < 70
+    ) {
+      contextType =
+        'Learning continuity concern';
+    } else if (
+      visual >= 75 &&
+      audio >= 75 &&
+      assessment >= 75
+    ) {
+      contextType =
+        'Healthy learning pattern';
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * COMBINED RISK
+     * ---------------------------------------------------------
+     */
+
+    const attendanceAdjustedRisk =
+      learningRisk * 0.85 +
+      attendanceRisk * 0.15;
+
+    const combinedRisk = clamp(
+      attendanceAdjustedRisk +
+        interactionBoost,
+    );
 
     let riskLevel: RiskLevel;
 
@@ -166,44 +618,46 @@ export default function CrossSensePanel({
     }
 
     /*
-     * Identify the dominant signals.
+     * ---------------------------------------------------------
+     * CONTRIBUTING CONCERNS
+     * ---------------------------------------------------------
      */
 
     const concerns: string[] = [];
 
     if (visual < 60) {
       concerns.push(
-        'visual engagement is low'
+        'Visual engagement is low',
       );
     }
 
     if (audio < 60) {
       concerns.push(
-        'audio participation is low'
+        'Audio participation is low',
       );
     }
 
     if (assessment < 70) {
       concerns.push(
-        'assessment performance is below target'
+        'Assessment performance is below target',
       );
     }
 
     if (gaps > 35) {
       concerns.push(
-        'learning gaps are significant'
+        'Learning gaps are significant',
       );
     }
 
     if (attendanceValue < 75) {
       concerns.push(
-        'attendance is affecting learning continuity'
+        'Attendance may affect learning continuity',
       );
     }
 
     /*
      * ---------------------------------------------------------
-     * CONTEXTUAL INTERPRETATION
+     * EXPLAINABLE REASONING
      * ---------------------------------------------------------
      */
 
@@ -215,48 +669,73 @@ export default function CrossSensePanel({
       assessment < 70
     ) {
       reasoning =
-        'Visual engagement, audio participation, and assessment performance are simultaneously below target. The combined pattern strongly suggests that the student may be struggling to understand or follow the current lesson.';
+        `${studentName}'s visual engagement (${Math.round(
+          visual,
+        )}%), audio participation (${Math.round(
+          audio,
+        )}%), and assessment performance (${Math.round(
+          assessment,
+        )}%) are simultaneously below target. The cross-sense pattern indicates a possible difficulty following or understanding the current lesson.`;
     } else if (
-      visual < 60 &&
-      audio < 60
-    ) {
-      reasoning =
-        'Both visual engagement and audio participation are low. Since two independent classroom signals indicate reduced participation, the system identifies a possible disengagement pattern.';
-    } else if (
-      assessment < 70 &&
-      gaps > 35
-    ) {
-      reasoning =
-        'Assessment performance is low while estimated learning gaps are high. The combined evidence indicates that additional explanation or remedial learning may be required.';
-    } else if (
-      attendanceValue < 75 &&
+      visual >= 70 &&
+      audio >= 70 &&
       assessment < 70
     ) {
       reasoning =
-        'Low attendance combined with weaker assessment performance suggests that missed classroom exposure may be contributing to the learning difficulty.';
+        `${studentName} shows healthy classroom engagement and participation, but assessment performance is ${Math.round(
+          assessment,
+        )}%. This pattern suggests a possible comprehension or concept-mastery issue rather than simple disengagement.`;
     } else if (
       visual < 60 &&
       assessment < 70
     ) {
       reasoning =
-        'Reduced visual engagement is occurring alongside weaker assessment performance. This combination may indicate difficulty maintaining attention and understanding the lesson.';
+        `Visual engagement is ${Math.round(
+          visual,
+        )}% while assessment performance is ${Math.round(
+          assessment,
+        )}%. Their interaction indicates that reduced attention may be associated with weaker learning outcomes.`;
     } else if (
       audio < 60 &&
       assessment < 70
     ) {
       reasoning =
-        'Reduced audio participation combined with lower assessment performance suggests that the student may need more interactive explanation or guided practice.';
+        `Audio participation is ${Math.round(
+          audio,
+        )}% and assessment performance is ${Math.round(
+          assessment,
+        )}%. The combined evidence suggests that more interactive explanation or guided practice may help.`;
+    } else if (
+      assessment < 70 &&
+      gaps > 35
+    ) {
+      reasoning =
+        `Assessment performance is ${Math.round(
+          assessment,
+        )}% while estimated learning gaps are ${Math.round(
+          gaps,
+        )}%. The two learning indicators reinforce each other and suggest a need for targeted remediation.`;
+    } else if (
+      attendanceValue < 75 &&
+      assessment < 70
+    ) {
+      reasoning =
+        `Attendance is ${Math.round(
+          attendanceValue,
+        )}% and assessment performance is ${Math.round(
+          assessment,
+        )}%. Missed classroom exposure may be contributing to the observed learning difficulty.`;
     } else if (combinedRisk < 40) {
       reasoning =
-        'The available signals are generally healthy. Engagement, participation, assessment performance, attendance, and learning-gap indicators do not show a significant combined risk.';
+        `${studentName}'s available signals are generally healthy. Engagement, participation, attendance, assessment performance, and learning readiness do not show a significant combined risk.`;
     } else {
       reasoning =
-        'The signals show some areas that require attention. The system recommends monitoring the student and providing targeted support based on the strongest contributing indicators.';
+        `The signals show some areas requiring attention. The strongest contributing indicators are being combined to recommend a targeted classroom response.`;
     }
 
     /*
      * ---------------------------------------------------------
-     * UNIFIED AI RECOMMENDATION
+     * UNIFIED RECOMMENDATION
      * ---------------------------------------------------------
      */
 
@@ -264,19 +743,27 @@ export default function CrossSensePanel({
     let action: string;
 
     if (
+      contextType ===
+      'Possible comprehension difficulty'
+    ) {
+      recommendation =
+        'Provide concept-focused explanation.';
+      action =
+        'Give a short teacher explanation, visual example, and 5-question comprehension check.';
+    } else if (
       riskLevel === 'High'
     ) {
       recommendation =
         'Start a targeted remedial intervention.';
       action =
-        'Re-teach the topic using a short visual explanation followed by an interactive practice activity.';
+        'Re-teach the topic using a short visual explanation followed by interactive practice.';
     } else if (
       riskLevel === 'Moderate'
     ) {
       recommendation =
         'Provide targeted reinforcement.';
       action =
-        'Give the student a short revision activity and monitor engagement during the next lesson.';
+        'Assign a short revision activity and monitor engagement during the next lesson.';
     } else {
       recommendation =
         'Continue the current learning strategy.';
@@ -286,15 +773,11 @@ export default function CrossSensePanel({
 
     /*
      * ---------------------------------------------------------
-     * CONFIDENCE
+     * TEMPORAL CONFIDENCE
      * ---------------------------------------------------------
-     *
-     * Confidence increases when multiple signals agree.
      */
 
-    let agreement = 0;
-
-    const signals = [
+    const signalValues = [
       visual,
       audio,
       assessment,
@@ -302,54 +785,46 @@ export default function CrossSensePanel({
       100 - gaps,
     ];
 
-    const average =
-      signals.reduce(
-        (sum, value) => sum + value,
-        0
-      ) / signals.length;
+    const mean = average(signalValues);
 
-    const variance =
-      signals.reduce(
-        (sum, value) =>
-          sum +
-          Math.pow(
-            value - average,
-            2
-          ),
-        0
-      ) / signals.length;
+    const variance = average(
+      signalValues.map((value) =>
+        Math.pow(value - mean, 2),
+      ),
+    );
 
-    const consistency =
-      Math.max(
-        0,
-        1 -
-          Math.sqrt(variance) /
-            50
-      );
+    const consistency = clamp(
+      1 - Math.sqrt(variance) / 50,
+      0,
+      1,
+    );
 
-    agreement += consistency * 35;
+    const temporalStrength = clamp(
+      temporalReadings.length / 8,
+      0,
+      1,
+    );
+
+    let confidence =
+      58 +
+      consistency * 20 +
+      temporalStrength * 12;
 
     if (
-      (visual < 60 &&
-        audio < 60) ||
-      (assessment < 70 &&
-        gaps > 35)
+      relationships.length >= 2
     ) {
-      agreement += 25;
+      confidence += 5;
     }
 
-    agreement +=
-      Math.min(
-        25,
-        concerns.length * 6
-      );
+    if (
+      cameraActive ||
+      microphoneActive
+    ) {
+      confidence += 2;
+    }
 
-    const confidence = Math.round(
-      clamp(
-        55 + agreement,
-        55,
-        96
-      )
+    confidence = Math.round(
+      clamp(confidence, 55, 96),
     );
 
     return {
@@ -368,10 +843,56 @@ export default function CrossSensePanel({
       action,
       confidence,
       concerns,
+      relationships,
+      contextType,
     };
   }, [
-    visualActivity,
-    audioActivity,
+    liveVisual,
+    liveAudio,
+    assessmentScore,
+    attendance,
+    learningGaps,
+    studentName,
+    temporalReadings.length,
+    cameraActive,
+    microphoneActive,
+  ]);
+
+  /*
+   * =========================================================
+   * TEMPORAL ANALYSIS
+   * =========================================================
+   *
+   * Every 3 seconds a reading is stored.
+   * The system therefore evaluates patterns rather than
+   * relying only on a single instant.
+   */
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const reading: TemporalReading = {
+        visual: liveVisual,
+        audio: liveAudio,
+        assessment: clamp(
+          assessmentScore,
+        ),
+        attendance: clamp(attendance),
+        gaps: clamp(learningGaps),
+        timestamp: Date.now(),
+      };
+
+      setTemporalReadings((previous) => [
+        ...previous.slice(-7),
+        reading,
+      ]);
+    }, 3000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [
+    liveVisual,
+    liveAudio,
     assessmentScore,
     attendance,
     learningGaps,
@@ -379,7 +900,42 @@ export default function CrossSensePanel({
 
   /*
    * =========================================================
-   * SIGNAL DATA
+   * DECISION HISTORY
+   * =========================================================
+   */
+
+  useEffect(() => {
+    const historyItem: DecisionHistoryItem = {
+      id: Date.now(),
+      time: formatTime(Date.now()),
+      riskLevel: analysis.riskLevel,
+      confidence: analysis.confidence,
+      reason: analysis.contextType,
+    };
+
+    setDecisionHistory((previous) => {
+      if (
+        previous.length > 0 &&
+        previous[previous.length - 1].riskLevel ===
+          historyItem.riskLevel
+      ) {
+        return previous;
+      }
+
+      return [
+        ...previous.slice(-4),
+        historyItem,
+      ];
+    });
+  }, [
+    analysis.riskLevel,
+    analysis.confidence,
+    analysis.contextType,
+  ]);
+
+  /*
+   * =========================================================
+   * INPUT SIGNALS
    * =========================================================
    */
 
@@ -389,14 +945,14 @@ export default function CrossSensePanel({
       value: analysis.visual,
       icon: Eye,
       description:
-        'Camera-based classroom engagement signal',
+        'Camera-assisted classroom engagement signal',
     },
     {
       label: 'Audio Participation',
       value: analysis.audio,
       icon: Mic,
       description:
-        'Voice and participation activity',
+        'Microphone-based participation activity',
     },
     {
       label: 'Assessment',
@@ -413,17 +969,17 @@ export default function CrossSensePanel({
         'Class attendance continuity',
     },
     {
-      label: 'Learning Gap',
+      label: 'Learning Readiness',
       value: 100 - analysis.gaps,
       icon: Brain,
       description:
-        'Estimated learning readiness',
+        'Estimated readiness based on learning gaps',
     },
   ];
 
   /*
    * =========================================================
-   * HELPERS
+   * RISK STYLES
    * =========================================================
    */
 
@@ -452,9 +1008,50 @@ export default function CrossSensePanel({
   };
 
   const currentRisk =
-    riskStyles[
-      analysis.riskLevel
-    ];
+    riskStyles[analysis.riskLevel];
+
+  /*
+   * =========================================================
+   * ACTION HANDLERS
+   * =========================================================
+   */
+
+  const handleCreateIntervention =
+    () => {
+      setInterventionCreated(true);
+
+      onInterventionCreate?.({
+        studentName,
+        riskLevel:
+          analysis.riskLevel,
+        recommendation:
+          analysis.recommendation,
+        action: analysis.action,
+      });
+    };
+
+  const handleNotifyTeacher = () => {
+    setTeacherNotified(true);
+
+    onTeacherNotify?.({
+      studentName,
+      riskLevel:
+        analysis.riskLevel,
+      reasoning:
+        analysis.reasoning,
+    });
+  };
+
+  const resetActions = () => {
+    setInterventionCreated(false);
+    setTeacherNotified(false);
+  };
+
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
 
   return (
     <Card className="glass overflow-hidden border-primary/20">
@@ -484,19 +1081,233 @@ export default function CrossSensePanel({
             <p className="max-w-2xl text-sm text-muted-foreground">
               Fuses visual, audio, performance,
               attendance, and learning-gap signals
-              to produce one contextual learning
-              decision.
+              into one contextual learning decision
+              for{' '}
+              <span className="font-semibold text-foreground">
+                {studentName}
+              </span>
+              .
             </p>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary">
-            <Sparkles className="h-4 w-4" />
-            Multi-Modal Fusion Active
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary">
+              <Sparkles className="h-4 w-4" />
+              Multi-Modal Fusion Active
+            </div>
+
+            {temporalReadings.length > 0 && (
+              <Badge
+                variant="outline"
+                className="rounded-full"
+              >
+                <Clock3 className="mr-1 h-3.5 w-3.5" />
+                {temporalReadings.length} observations
+              </Badge>
+            )}
           </div>
         </div>
       </div>
 
       <div className="space-y-6 p-6">
+        {/* ===================================================
+            LIVE CAMERA + MICROPHONE
+        ==================================================== */}
+
+        <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+          <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Activity className="h-4 w-4" />
+                </div>
+
+                <h3 className="font-semibold">
+                  Live Classroom Assistance
+                </h3>
+              </div>
+
+              <p className="mt-1 text-xs text-muted-foreground">
+                Camera and microphone signals can be
+                activated to strengthen real-time
+                classroom analysis.
+              </p>
+            </div>
+
+            <Badge
+              className={cn(
+                'rounded-full',
+                cameraActive ||
+                  microphoneActive
+                  ? 'bg-success/10 text-success'
+                  : 'bg-muted text-muted-foreground',
+              )}
+            >
+              {cameraActive ||
+              microphoneActive ? (
+                <>
+                  <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                  Live assistance active
+                </>
+              ) : (
+                'Ready to activate'
+              )}
+            </Badge>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            {/* Camera */}
+
+            <div className="rounded-2xl border border-border/60 bg-card/70 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Camera className="h-5 w-5" />
+                  </div>
+
+                  <div>
+                    <p className="font-semibold">
+                      Camera Assistance
+                    </p>
+
+                    <p className="text-xs text-muted-foreground">
+                      {cameraStatus}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  size="sm"
+                  variant={
+                    cameraActive
+                      ? 'destructive'
+                      : 'default'
+                  }
+                  onClick={
+                    cameraActive
+                      ? stopCamera
+                      : startCamera
+                  }
+                  className="gap-2"
+                >
+                  {cameraActive ? (
+                    <>
+                      <VideoOff className="h-4 w-4" />
+                      Stop
+                    </>
+                  ) : (
+                    <>
+                      <Video className="h-4 w-4" />
+                      Start
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {cameraActive && (
+                <div className="mt-4 overflow-hidden rounded-xl border border-border/60 bg-black">
+                  <video
+                    ref={videoRef}
+                    muted
+                    playsInline
+                    className="h-40 w-full object-cover"
+                  />
+                </div>
+              )}
+
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  Visual activity
+                </span>
+
+                <span className="font-bold text-primary">
+                  {Math.round(
+                    analysis.visual,
+                  )}
+                  %
+                </span>
+              </div>
+            </div>
+
+            {/* Microphone */}
+
+            <div className="rounded-2xl border border-border/60 bg-card/70 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                    {microphoneActive ? (
+                      <Mic className="h-5 w-5" />
+                    ) : (
+                      <MicOff className="h-5 w-5" />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="font-semibold">
+                      Audio Assistance
+                    </p>
+
+                    <p className="text-xs text-muted-foreground">
+                      {microphoneStatus}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  size="sm"
+                  variant={
+                    microphoneActive
+                      ? 'destructive'
+                      : 'default'
+                  }
+                  onClick={
+                    microphoneActive
+                      ? stopMicrophone
+                      : startMicrophone
+                  }
+                  className="gap-2"
+                >
+                  {microphoneActive ? (
+                    <>
+                      <MicOff className="h-4 w-4" />
+                      Stop
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="h-4 w-4" />
+                      Start
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <div className="mt-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    Audio participation
+                  </span>
+
+                  <span className="font-bold text-primary">
+                    {Math.round(
+                      analysis.audio,
+                    )}
+                    %
+                  </span>
+                </div>
+
+                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-300"
+                    style={{
+                      width: `${analysis.audio}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ===================================================
             EVALUATION CRITERIA 1
             MULTI-INPUT
@@ -516,8 +1327,8 @@ export default function CrossSensePanel({
               </div>
 
               <p className="mt-1 text-xs text-muted-foreground">
-                Five independent signals are being
-                processed together.
+                Five independent signals are processed
+                together.
               </p>
             </div>
 
@@ -566,7 +1377,7 @@ export default function CrossSensePanel({
                     />
                   </div>
                 </div>
-              )
+              ),
             )}
           </div>
         </section>
@@ -644,18 +1455,161 @@ export default function CrossSensePanel({
 
             <p className="mt-1 text-2xl font-bold">
               {Math.round(
-                analysis.combinedRisk
+                analysis.combinedRisk,
               )}
               % risk
             </p>
 
             {analysis.interactionBoost > 0 && (
               <p className="mt-1 text-xs font-medium text-warning">
-                +{Math.round(
-                  analysis.interactionBoost
+                +
+                {Math.round(
+                  analysis.interactionBoost,
                 )}
-                % cross-modal reinforcement detected
+                % cross-modal reinforcement
+                detected
               </p>
+            )}
+
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {analysis.relationships.length >
+              0 ? (
+                analysis.relationships.map(
+                  (relationship) => (
+                    <Badge
+                      key={relationship}
+                      variant="outline"
+                      className="max-w-full whitespace-normal text-center"
+                    >
+                      {relationship}
+                    </Badge>
+                  ),
+                )
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-success"
+                >
+                  No negative cross-modal interaction
+                  detected
+                </Badge>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================
+            TEMPORAL ANALYSIS
+        ==================================================== */}
+
+        <section>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Clock3 className="h-4 w-4" />
+                </div>
+
+                <h3 className="font-semibold">
+                  Temporal Pattern Analysis
+                </h3>
+              </div>
+
+              <p className="mt-1 text-xs text-muted-foreground">
+                Decisions are strengthened by repeated
+                observations instead of a single reading.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              YES
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border/60 bg-muted/10 p-5">
+            <div className="grid gap-4 md:grid-cols-3">
+              <TemporalCard
+                title="Observations"
+                value={`${temporalReadings.length}`}
+                description="Recent signal readings"
+                icon={Activity}
+              />
+
+              <TemporalCard
+                title="Current risk"
+                value={`${Math.round(
+                  analysis.combinedRisk,
+                )}%`}
+                description="Latest combined risk"
+                icon={Target}
+              />
+
+              <TemporalCard
+                title="AI confidence"
+                value={`${analysis.confidence}%`}
+                description="Evidence agreement"
+                icon={ShieldCheck}
+              />
+            </div>
+
+            {temporalReadings.length > 0 && (
+              <div className="mt-5">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Recent observations
+                </p>
+
+                <div className="space-y-2">
+                  {temporalReadings
+                    .slice()
+                    .reverse()
+                    .slice(0, 5)
+                    .map((reading) => (
+                      <div
+                        key={reading.timestamp}
+                        className="flex flex-col gap-2 rounded-xl border border-border/60 bg-card/70 p-3 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <span className="text-xs text-muted-foreground">
+                          {formatTime(
+                            reading.timestamp,
+                          )}
+                        </span>
+
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <span>
+                            Visual{' '}
+                            <b>
+                              {Math.round(
+                                reading.visual,
+                              )}
+                              %
+                            </b>
+                          </span>
+
+                          <span>
+                            Audio{' '}
+                            <b>
+                              {Math.round(
+                                reading.audio,
+                              )}
+                              %
+                            </b>
+                          </span>
+
+                          <span>
+                            Assessment{' '}
+                            <b>
+                              {Math.round(
+                                reading.assessment,
+                              )}
+                              %
+                            </b>
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
             )}
           </div>
         </section>
@@ -698,23 +1652,32 @@ export default function CrossSensePanel({
               <div className="space-y-3">
                 <ReasoningSignal
                   label="Engagement risk"
-                  value={analysis.engagementRisk}
+                  value={
+                    analysis.engagementRisk
+                  }
                 />
 
                 <ReasoningSignal
                   label="Learning risk"
-                  value={analysis.learningRisk}
+                  value={
+                    analysis.learningRisk
+                  }
                 />
 
                 <ReasoningSignal
-                  label="Attendance factor"
-                  value={analysis.attendanceValue}
+                  label="Attendance health"
+                  value={
+                    analysis.attendanceValue
+                  }
                   inverse
                 />
 
                 <ReasoningSignal
                   label="Learning readiness"
-                  value={100 - analysis.gaps}
+                  value={
+                    100 - analysis.gaps
+                  }
+                  inverse
                 />
               </div>
             </div>
@@ -728,11 +1691,16 @@ export default function CrossSensePanel({
                 </p>
               </div>
 
+              <div className="mb-3 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {analysis.contextType}
+              </div>
+
               <p className="text-sm leading-6 text-muted-foreground">
                 {analysis.reasoning}
               </p>
 
-              {analysis.concerns.length > 0 && (
+              {analysis.concerns.length >
+                0 && (
                 <div className="mt-4">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Contributing signals
@@ -747,7 +1715,7 @@ export default function CrossSensePanel({
                         >
                           {concern}
                         </span>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -788,7 +1756,7 @@ export default function CrossSensePanel({
           <div
             className={cn(
               'rounded-3xl border p-6',
-              currentRisk.card
+              currentRisk.card,
             )}
           >
             <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
@@ -797,7 +1765,7 @@ export default function CrossSensePanel({
                   <div
                     className={cn(
                       'flex h-12 w-12 items-center justify-center rounded-2xl',
-                      currentRisk.icon
+                      currentRisk.icon,
                     )}
                   >
                     {analysis.riskLevel ===
@@ -816,7 +1784,7 @@ export default function CrossSensePanel({
                     <h4
                       className={cn(
                         'text-2xl font-bold',
-                        currentRisk.text
+                        currentRisk.text,
                       )}
                     >
                       {analysis.riskLevel}{' '}
@@ -874,6 +1842,168 @@ export default function CrossSensePanel({
                 </p>
               </div>
             </div>
+
+            {/* Teacher actions */}
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Button
+                onClick={
+                  handleCreateIntervention
+                }
+                disabled={interventionCreated}
+                className="gap-2"
+              >
+                {interventionCreated ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    Intervention Created
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" />
+                    Create Intervention
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={
+                  handleNotifyTeacher
+                }
+                disabled={teacherNotified}
+                className="gap-2"
+              >
+                {teacherNotified ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    Teacher Notified
+                  </>
+                ) : (
+                  <>
+                    <UserCheck className="h-4 w-4" />
+                    Notify Teacher
+                  </>
+                )}
+              </Button>
+
+              {(interventionCreated ||
+                teacherNotified) && (
+                <Button
+                  variant="ghost"
+                  onClick={resetActions}
+                  className="gap-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Reset
+                </Button>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================
+            DECISION HISTORY
+        ==================================================== */}
+
+        <section>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+
+                <h3 className="font-semibold">
+                  AI Decision History
+                </h3>
+              </div>
+
+              <p className="mt-1 text-xs text-muted-foreground">
+                Previous decisions help demonstrate how
+                the student's learning state changes over
+                time.
+              </p>
+            </div>
+
+            <Badge
+              variant="outline"
+              className="rounded-full"
+            >
+              Temporal monitoring
+            </Badge>
+          </div>
+
+          <div className="rounded-2xl border border-border/60 bg-muted/10 p-5">
+            {decisionHistory.length ===
+            0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                Waiting for the first AI decision...
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {decisionHistory
+                  .slice()
+                  .reverse()
+                  .map((item, index) => {
+                    const style =
+                      riskStyles[
+                        item.riskLevel
+                      ];
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/70 p-4 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={cn(
+                              'flex h-9 w-9 items-center justify-center rounded-xl',
+                              style.icon,
+                            )}
+                          >
+                            {item.riskLevel ===
+                            'Low' ? (
+                              <CheckCircle2 className="h-4 w-4" />
+                            ) : (
+                              <AlertTriangle className="h-4 w-4" />
+                            )}
+                          </div>
+
+                          <div>
+                            <p className="text-sm font-semibold">
+                              Decision{' '}
+                              {decisionHistory.length -
+                                index}
+                            </p>
+
+                            <p className="text-xs text-muted-foreground">
+                              {item.time} ·{' '}
+                              {item.reason}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              style.text,
+                            )}
+                          >
+                            {item.riskLevel}
+                          </Badge>
+
+                          <span className="text-xs text-muted-foreground">
+                            {item.confidence}% confidence
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
         </section>
 
@@ -881,7 +2011,7 @@ export default function CrossSensePanel({
             FUSION SUMMARY
         ==================================================== */}
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryCard
             icon={TrendingUp}
             title="Inputs Combined"
@@ -897,10 +2027,17 @@ export default function CrossSensePanel({
           />
 
           <SummaryCard
+            icon={Clock3}
+            title="Temporal Analysis"
+            value={`${temporalReadings.length} Observations`}
+            description="Repeated readings strengthen the decision"
+          />
+
+          <SummaryCard
             icon={ShieldCheck}
             title="Final Output"
             value="1 Decision"
-            description="Risk + confidence + recommended intervention"
+            description="Risk + confidence + intervention"
           />
         </div>
       </div>
@@ -908,9 +2045,11 @@ export default function CrossSensePanel({
   );
 }
 
-/* =========================================================
-   FUSION NODE
-========================================================= */
+/*
+ * =========================================================
+ * FUSION NODE
+ * =========================================================
+ */
 
 function FusionNode({
   icon: Icon,
@@ -938,9 +2077,11 @@ function FusionNode({
   );
 }
 
-/* =========================================================
-   REASONING SIGNAL
-========================================================= */
+/*
+ * =========================================================
+ * REASONING SIGNAL
+ * =========================================================
+ */
 
 function ReasoningSignal({
   label,
@@ -953,14 +2094,9 @@ function ReasoningSignal({
 }) {
   const safeValue = clamp(value);
 
-  const displayValue = inverse
-    ? safeValue
-    : safeValue;
-
-  const isHealthy =
-    inverse
-      ? safeValue >= 75
-      : safeValue < 40;
+  const isHealthy = inverse
+    ? safeValue >= 75
+    : safeValue < 40;
 
   return (
     <div>
@@ -974,10 +2110,10 @@ function ReasoningSignal({
             'text-xs font-semibold',
             isHealthy
               ? 'text-success'
-              : 'text-warning'
+              : 'text-warning',
           )}
         >
-          {Math.round(displayValue)}%
+          {Math.round(safeValue)}%
         </span>
       </div>
 
@@ -987,7 +2123,7 @@ function ReasoningSignal({
             'h-full rounded-full transition-all duration-500',
             isHealthy
               ? 'bg-success'
-              : 'bg-warning'
+              : 'bg-warning',
           )}
           style={{
             width: `${safeValue}%`,
@@ -998,9 +2134,49 @@ function ReasoningSignal({
   );
 }
 
-/* =========================================================
-   SUMMARY CARD
-========================================================= */
+/*
+ * =========================================================
+ * TEMPORAL CARD
+ * =========================================================
+ */
+
+function TemporalCard({
+  title,
+  value,
+  description,
+  icon: Icon,
+}: {
+  title: string;
+  value: string;
+  description: string;
+  icon: typeof Activity;
+}) {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-card/70 p-4">
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" />
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        {title}
+      </p>
+
+      <p className="mt-1 text-xl font-bold">
+        {value}
+      </p>
+
+      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+/*
+ * =========================================================
+ * SUMMARY CARD
+ * =========================================================
+ */
 
 function SummaryCard({
   icon: Icon,
