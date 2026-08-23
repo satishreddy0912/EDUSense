@@ -145,6 +145,9 @@ export default function CrossSensePanel({
     useState('Microphone monitoring inactive');
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const previousFrameRef = useRef<Uint8ClampedArray | null>(null);
+  const cameraAnimRef = useRef<number | null>(null);
 
   const cameraStreamRef =
     useRef<MediaStream | null>(null);
@@ -186,7 +189,22 @@ export default function CrossSensePanel({
    * identity recognition.
    */
 
+  const attachVideoRef = useCallback((element: HTMLVideoElement | null) => {
+    videoRef.current = element;
+    if (element && cameraStreamRef.current) {
+      element.srcObject = cameraStreamRef.current;
+      element.muted = true;
+      element.playsInline = true;
+      element.play().catch(() => {});
+    }
+  }, []);
+
   const stopCamera = useCallback(() => {
+    if (cameraAnimRef.current !== null) {
+      cancelAnimationFrame(cameraAnimRef.current);
+      cameraAnimRef.current = null;
+    }
+
     if (cameraStreamRef.current) {
       cameraStreamRef.current
         .getTracks()
@@ -196,25 +214,37 @@ export default function CrossSensePanel({
     }
 
     if (videoRef.current) {
+      videoRef.current.pause();
       videoRef.current.srcObject = null;
     }
 
+    previousFrameRef.current = null;
     setCameraActive(false);
     setCameraStatus('Camera assistance inactive');
   }, []);
 
   const startCamera = useCallback(async () => {
     try {
-      if (!navigator.mediaDevices?.getUserMedia) {
+      if (
+        typeof navigator === 'undefined' ||
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+      ) {
         setCameraStatus(
-          'Camera API is not supported in this browser',
+          'Camera API is not supported in this browser (HTTPS or localhost required)',
         );
         return;
       }
 
+      setCameraStatus('Requesting camera permission...');
+
       const stream =
         await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: {
+            facingMode: 'user',
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
           audio: false,
         });
 
@@ -222,20 +252,62 @@ export default function CrossSensePanel({
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.muted = true;
+        videoRef.current.playsInline = true;
         await videoRef.current.play().catch(() => {});
       }
 
       setCameraActive(true);
       setCameraStatus(
-        'Camera assistance active — visual activity monitored',
+        'Camera live — visual activity monitored',
       );
-    } catch {
-      setCameraStatus(
-        'Camera permission was not granted',
-      );
+    } catch (err: unknown) {
+      console.error('Camera access error:', err);
       setCameraActive(false);
+
+      if (err instanceof DOMException) {
+        switch (err.name) {
+          case 'NotAllowedError':
+          case 'PermissionDeniedError':
+            setCameraStatus(
+              'Camera permission blocked. Please allow camera in browser site settings.',
+            );
+            break;
+          case 'NotFoundError':
+          case 'DevicesNotFoundError':
+            setCameraStatus('No camera found on this device.');
+            break;
+          case 'NotReadableError':
+          case 'TrackStartError':
+            setCameraStatus(
+              'Camera is already in use by another application.',
+            );
+            break;
+          case 'SecurityError':
+            setCameraStatus(
+              'Camera access blocked by browser security policy (requires HTTPS).',
+            );
+            break;
+          default:
+            setCameraStatus(`Camera error: ${err.name}`);
+        }
+      } else if (err instanceof Error) {
+        setCameraStatus(err.message);
+      } else {
+        setCameraStatus('Camera permission was not granted');
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (cameraActive && cameraStreamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      video.srcObject = cameraStreamRef.current;
+      video.muted = true;
+      video.playsInline = true;
+      video.play().catch(() => {});
+    }
+  }, [cameraActive]);
 
   /*
    * =========================================================
@@ -403,50 +475,77 @@ export default function CrossSensePanel({
 
   /*
    * =========================================================
-   * CAMERA ACTIVITY ESTIMATION
+   * REAL-TIME CAMERA ACTIVITY ESTIMATION
    * =========================================================
-   *
-   * We don't claim to identify a person.
-   *
-   * The browser camera is used as an assistance signal.
    */
 
   useEffect(() => {
-    if (!cameraActive) return;
+    if (!cameraActive) {
+      if (cameraAnimRef.current !== null) {
+        cancelAnimationFrame(cameraAnimRef.current);
+        cameraAnimRef.current = null;
+      }
+      previousFrameRef.current = null;
+      return;
+    }
 
-    const interval = window.setInterval(() => {
-      /*
-       * A small controlled variation simulates the
-       * continuously changing visual activity signal
-       * while the camera is active.
-       *
-       * The actual camera stream is active and permission
-       * is genuinely requested from the browser.
-       */
+    const analyzeVideoFrame = () => {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
 
-      setLiveVisual((previous) => {
-        const variation =
-          Math.round(
-            (Math.random() - 0.5) * 8,
-          );
+      if (!video || !canvas || video.readyState < 2) {
+        cameraAnimRef.current = requestAnimationFrame(analyzeVideoFrame);
+        return;
+      }
 
-        const next = clamp(
-          previous + variation,
+      const width = 160;
+      const height = 90;
+      canvas.width = width;
+      canvas.height = height;
+
+      const context = canvas.getContext('2d', {
+        willReadFrequently: true,
+      });
+
+      if (!context) {
+        cameraAnimRef.current = requestAnimationFrame(analyzeVideoFrame);
+        return;
+      }
+
+      context.drawImage(video, 0, 0, width, height);
+      const currentFrame = context.getImageData(0, 0, width, height).data;
+
+      if (previousFrameRef.current) {
+        let diff = 0;
+        for (let i = 0; i < currentFrame.length; i += 4) {
+          diff +=
+            Math.abs(currentFrame[i] - previousFrameRef.current[i]) +
+            Math.abs(currentFrame[i + 1] - previousFrameRef.current[i + 1]) +
+            Math.abs(currentFrame[i + 2] - previousFrameRef.current[i + 2]);
+        }
+
+        const avgDiff = diff / (width * height * 3);
+        const computedActivity = Math.round(
+          Math.min(100, Math.max(30, avgDiff * 8 + 45)),
         );
 
-        onVisualActivityChange?.(next);
+        setLiveVisual(computedActivity);
+        onVisualActivityChange?.(computedActivity);
+      }
 
-        return next;
-      });
-    }, 1500);
+      previousFrameRef.current = new Uint8ClampedArray(currentFrame);
+      cameraAnimRef.current = requestAnimationFrame(analyzeVideoFrame);
+    };
+
+    cameraAnimRef.current = requestAnimationFrame(analyzeVideoFrame);
 
     return () => {
-      window.clearInterval(interval);
+      if (cameraAnimRef.current !== null) {
+        cancelAnimationFrame(cameraAnimRef.current);
+        cameraAnimRef.current = null;
+      }
     };
-  }, [
-    cameraActive,
-    onVisualActivityChange,
-  ]);
+  }, [cameraActive, onVisualActivityChange]);
 
   /*
    * =========================================================
@@ -1205,15 +1304,21 @@ export default function CrossSensePanel({
               </div>
 
               {cameraActive && (
-                <div className="mt-4 overflow-hidden rounded-xl border border-border/60 bg-black">
+                <div className="relative mt-4 overflow-hidden rounded-xl border border-primary/30 bg-black shadow-inner">
                   <video
-                    ref={videoRef}
+                    ref={attachVideoRef}
+                    autoPlay
                     muted
                     playsInline
-                    className="h-40 w-full object-cover"
+                    className="h-44 w-full object-cover"
                   />
+                  <div className="absolute top-2 left-2 flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-medium text-emerald-400 backdrop-blur-sm">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+                    LIVE CAMERA FEED
+                  </div>
                 </div>
               )}
+              <canvas ref={canvasRef} className="hidden" />
 
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">
