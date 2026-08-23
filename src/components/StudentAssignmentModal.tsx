@@ -423,40 +423,40 @@ export default function StudentAssignmentModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/85 p-2 sm:p-4 md:p-6 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-2 sm:p-4 md:p-6 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.25 }}
-          className="relative flex h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-cyan-500/30 bg-[#0a0f26] text-foreground shadow-[0_0_60px_rgba(0,210,255,0.25)]"
+          className="relative flex h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-border/80 bg-card text-foreground shadow-2xl"
         >
           {/* ===================================================
               TOP HEADER BAR
           =================================================== */}
-          <div className="flex flex-wrap items-center justify-between border-b border-cyan-500/20 bg-gradient-to-r from-cyan-950/40 via-background to-cyan-950/20 px-5 py-3.5 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5 sm:px-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(0,210,255,0.4)]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
                 <BookOpen className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-bold text-white tracking-wide">{assignment.title}</h2>
-                  <Badge variant="outline" className="border-cyan-500/40 bg-cyan-500/10 text-cyan-300 text-[11px]">
+                  <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">{assignment.title}</h2>
+                  <Badge variant="outline" className="border-border text-xs">
                     {assignment.subject}
                   </Badge>
                   {mode === 'answering' ? (
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono animate-pulse">
+                    <Badge className="bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 text-[11px]">
                       Live Answering
                     </Badge>
                   ) : (
-                    <Badge className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-[11px] font-mono">
+                    <Badge className="bg-primary/15 text-primary border border-primary/30 text-[11px]">
                       Results & Solutions
                     </Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Teacher: <span className="text-cyan-300 font-medium">{assignment.teacherName}</span> • Topic:{' '}
+                  Teacher: <span className="text-foreground font-medium">{assignment.teacherName}</span> • Topic:{' '}
                   <span className="text-foreground">{assignment.topic}</span>
                 </p>
               </div>
@@ -464,8 +464,8 @@ export default function StudentAssignmentModal({
 
             <div className="flex items-center gap-3 mt-2 sm:mt-0">
               {mode === 'answering' && (
-                <div className="flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-mono text-cyan-300">
-                  <Clock className="h-3.5 w-3.5 animate-spin" />
+                <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-3 py-1 text-xs font-mono text-foreground">
+                  <Clock className="h-3.5 w-3.5 text-primary" />
                   <span>{formatTime(timeSpentSeconds)}</span>
                 </div>
               )}
@@ -474,7 +474,7 @@ export default function StudentAssignmentModal({
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                className="h-8 w-8 rounded-full text-muted-foreground hover:bg-white/10 hover:text-white"
+                className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -513,43 +513,43 @@ export default function StudentAssignmentModal({
                     animate={{ opacity: 1, y: 0 }}
                     className="mx-auto max-w-3xl space-y-6"
                   >
-                    {/* Celebratory Hero Card */}
-                    <div className="relative overflow-hidden rounded-3xl border border-cyan-500/40 bg-gradient-to-b from-cyan-950/60 via-[#0d1330] to-[#0a0f24] p-6 sm:p-8 text-center shadow-[0_0_40px_rgba(0,210,255,0.2)]">
-                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-400 text-white shadow-[0_0_30px_rgba(0,210,255,0.5)]">
-                        <Trophy className="h-8 w-8" />
+                    {/* Scorecard Hero Card */}
+                    <div className="rounded-2xl border border-border/80 bg-card p-6 sm:p-8 text-center shadow-sm">
+                      <div className="mx-auto mb-3.5 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        <Trophy className="h-7 w-7" />
                       </div>
 
-                      <Badge className="mb-2 bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs px-3 py-1">
+                      <Badge className="mb-2 bg-emerald-500/15 text-emerald-500 border-emerald-500/30 text-xs px-3 py-0.5">
                         Assignment Completed
                       </Badge>
 
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                      <h2 className="text-2xl font-bold text-foreground tracking-tight">
                         Great Effort, Aarav!
                       </h2>
-                      <p className="mt-2 text-sm text-cyan-200/80 max-w-xl mx-auto">{submissionResult.feedback}</p>
+                      <p className="mt-1.5 text-sm text-muted-foreground max-w-xl mx-auto">{submissionResult.feedback}</p>
 
                       {/* Key Score Metrics Grid */}
                       <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div className="rounded-2xl border border-cyan-500/20 bg-card/60 p-3.5">
-                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Score</p>
-                          <p className="text-xl font-bold text-cyan-300 mt-1">
+                        <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5">
+                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Score</p>
+                          <p className="text-xl font-bold text-primary mt-1">
                             {submissionResult.score} / {submissionResult.totalMarks}
                           </p>
                         </div>
 
-                        <div className="rounded-2xl border border-cyan-500/20 bg-card/60 p-3.5">
-                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Accuracy</p>
-                          <p className="text-xl font-bold text-emerald-400 mt-1">{submissionResult.percentage}%</p>
+                        <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5">
+                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Accuracy</p>
+                          <p className="text-xl font-bold text-emerald-500 mt-1">{submissionResult.percentage}%</p>
                         </div>
 
-                        <div className="rounded-2xl border border-cyan-500/20 bg-card/60 p-3.5">
-                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Grade</p>
-                          <p className="text-xl font-bold text-purple-300 mt-1">{submissionResult.grade}</p>
+                        <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5">
+                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Grade</p>
+                          <p className="text-xl font-bold text-purple-400 mt-1">{submissionResult.grade}</p>
                         </div>
 
-                        <div className="rounded-2xl border border-cyan-500/20 bg-card/60 p-3.5">
-                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Time Taken</p>
-                          <p className="text-xl font-bold text-amber-300 mt-1">{formatTime(submissionResult.timeSpentSeconds)}</p>
+                        <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5">
+                          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Time</p>
+                          <p className="text-xl font-bold text-amber-500 mt-1">{formatTime(submissionResult.timeSpentSeconds)}</p>
                         </div>
                       </div>
 
@@ -557,10 +557,10 @@ export default function StudentAssignmentModal({
                       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                         <Button
                           onClick={() => setMode('review')}
-                          className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 shadow-[0_0_20px_rgba(0,210,255,0.4)]"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 shadow-sm"
                         >
                           <FileText className="mr-2 h-4 w-4" />
-                          Review Solutions & Explanations
+                          View Detailed Solutions
                         </Button>
                         <Button
                           variant="outline"

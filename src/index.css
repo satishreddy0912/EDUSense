@@ -5,62 +5,61 @@
 @layer base {
   :root {
     /* =========================================================
-       CYBERPUNK 2077 DESIGN SYSTEM
-       - Void Obsidian Background: #050814
-       - Neon Cyan: #00f0ff (hsl(186, 100%, 50%))
-       - Laser Hot Pink / Magenta: #ff0055 (hsl(340, 100%, 50%))
-       - Cyberpunk Electric Yellow: #ffe600 (hsl(54, 100%, 50%))
-       - Matrix Toxic Green: #00ff66 (hsl(144, 100%, 50%))
-       - Glitch Violet: #9d00ff (hsl(277, 100%, 50%))
+       CLEAN & MODERN BASIC DESIGN SYSTEM
+       - Clean Slate Background: #0b0f19
+       - Card Surface: #111827 / #1e293b
+       - Primary: Modern Royal Indigo / Blue: #2563eb
+       - Foreground: Crisp White / Slate: #f8fafc
+       - Muted: #64748b / #94a3b8
     ========================================================= */
-    --background: 228 60% 5%;          /* #050814 - Deep Void Dark */
-    --foreground: 180 100% 98%;        /* #f0ffff - Ultra Bright Cyan-White */
-    --card: 228 50% 9%;                /* #0b0f24 - Cyber Obsidian Panel */
-    --card-foreground: 180 100% 98%;
-    --popover: 228 50% 9%;
-    --popover-foreground: 180 100% 98%;
+    --background: 222 47% 7%;           /* #0b0f19 */
+    --foreground: 210 40% 98%;          /* #f8fafc */
+    --card: 222 40% 12%;                /* #131b2e */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 40% 12%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Primary: Iconic Cyberpunk Neon Cyan */
-    --primary: 186 100% 50%;           /* #00f0ff */
-    --primary-foreground: 228 60% 5%;
+    /* Primary: Clean Modern Blue */
+    --primary: 217 91% 60%;            /* #3b82f6 */
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Deep Cyber Slate Indigo */
-    --secondary: 228 40% 15%;          /* #161b38 */
-    --secondary-foreground: 186 100% 90%;
+    /* Secondary: Slate */
+    --secondary: 217 33% 18%;           /* #1e293b */
+    --secondary-foreground: 210 40% 95%;
 
     /* Muted Elements */
-    --muted: 228 35% 13%;              /* #131730 */
-    --muted-foreground: 215 25% 65%;   /* #8ba0b8 */
+    --muted: 217 33% 15%;               /* #172033 */
+    --muted-foreground: 215 20% 65%;    /* #94a3b8 */
 
-    /* Accent: Laser Hot Magenta / Pink */
-    --accent: 340 100% 50%;            /* #ff0055 */
+    /* Accent */
+    --accent: 226 70% 55%;             /* #4f46e5 */
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive: Cyber Red */
-    --destructive: 350 100% 55%;        /* #ff1a40 */
+    /* Destructive */
+    --destructive: 0 84% 60%;          /* #ef4444 */
     --destructive-foreground: 0 0% 100%;
 
-    /* Success: Matrix Phosphor Green */
-    --success: 144 100% 50%;           /* #00ff66 */
-    --success-foreground: 228 60% 5%;
+    /* Success */
+    --success: 142 71% 45%;            /* #10b981 */
+    --success-foreground: 0 0% 100%;
 
-    /* Warning: Cyber Electric Yellow */
-    --warning: 54 100% 50%;            /* #ffe600 */
-    --warning-foreground: 228 60% 5%;
+    /* Warning */
+    --warning: 38 92% 50%;             /* #f59e0b */
+    --warning-foreground: 0 0% 100%;
 
-    /* Borders & Rings with Neon Resonance */
-    --border: 228 40% 20%;             /* #1f274a */
-    --input: 228 40% 16%;
-    --ring: 186 100% 50%;              /* #00f0ff */
+    /* Borders & Inputs */
+    --border: 217 33% 20%;             /* #243048 */
+    --input: 217 33% 18%;
+    --ring: 217 91% 60%;
 
-    /* Charts & Data Visualization */
-    --chart-1: 186 100% 50%;           /* Neon Cyan */
-    --chart-2: 340 100% 50%;           /* Laser Magenta */
-    --chart-3: 54 100% 50%;            /* Cyber Yellow */
-    --chart-4: 144 100% 50%;           /* Matrix Green */
-    --chart-5: 277 100% 50%;           /* Glitch Violet */
+    /* Charts */
+    --chart-1: 217 91% 60%;            /* Blue */
+    --chart-2: 142 71% 45%;            /* Green */
+    --chart-3: 262 83% 58%;            /* Violet */
+    --chart-4: 38 92% 50%;             /* Amber */
+    --chart-5: 0 84% 60%;              /* Red */
 
-    --radius: 0.875rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -72,136 +71,35 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground selection:bg-primary/30 selection:text-primary;
-    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    @apply bg-background text-foreground selection:bg-primary/20 selection:text-primary;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #050814;
-    background-image: 
-      radial-gradient(ellipse 85% 65% at 50% -15%, rgba(0, 240, 255, 0.12), transparent 75%),
-      radial-gradient(ellipse 65% 55% at 95% 85%, rgba(255, 0, 85, 0.08), transparent 75%),
-      radial-gradient(ellipse 55% 55% at 5% 90%, rgba(255, 230, 0, 0.06), transparent 75%),
-      linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    background-color: #0b0f19;
+    background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 60%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-    letter-spacing: -0.02em;
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.015em;
+    font-weight: 600;
   }
 }
 
 @layer utilities {
-  /* =========================================================
-     CYBERPUNK HUD PANELS & GLASS
-  ========================================================= */
+  /* Clean Glass Surface */
   .glass {
-    @apply bg-[#0b0f24]/85 backdrop-blur-xl border border-cyan-500/20 shadow-[0_8px_32px_rgba(0,0,0,0.6)];
+    @apply bg-[#131b2e]/90 backdrop-blur-md border border-border/80 shadow-md;
   }
   .glass:hover {
-    @apply border-cyan-400/40 shadow-[0_0_30px_rgba(0,240,255,0.2)];
+    @apply border-border shadow-lg;
   }
   .glass-strong {
-    @apply bg-[#0e132e]/90 backdrop-blur-2xl border border-cyan-400/30 shadow-[0_0_35px_rgba(0,240,255,0.2)];
+    @apply bg-[#162038] border border-border shadow-lg;
   }
 
-  /* Cyber Card with Chamfered Tech Edge */
-  .cyber-card {
-    @apply relative bg-[#0b0f24]/90 border border-cyan-500/30 rounded-2xl backdrop-blur-xl shadow-[0_0_25px_rgba(0,240,255,0.1)] transition-all;
-  }
-  .cyber-card:hover {
-    @apply border-cyan-400 shadow-[0_0_35px_rgba(0,240,255,0.25)] -translate-y-0.5;
-  }
-
-  /* Holographic Gradients */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-yellow-300 to-pink-500;
-  }
-  .text-gradient-cyan {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400;
-  }
-  .text-gradient-pink {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-rose-400 to-amber-300;
-  }
-  .text-gradient-yellow {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400;
-  }
-
-  /* Cyber Glow Shadows */
-  .glow-cyan {
-    box-shadow: 0 0 25px -3px rgba(0, 240, 255, 0.5), inset 0 0 15px -3px rgba(0, 240, 255, 0.2);
-  }
-  .glow-pink {
-    box-shadow: 0 0 25px -3px rgba(255, 0, 85, 0.5), inset 0 0 15px -3px rgba(255, 0, 85, 0.2);
-  }
-  .glow-yellow {
-    box-shadow: 0 0 25px -3px rgba(255, 230, 0, 0.5), inset 0 0 15px -3px rgba(255, 230, 0, 0.2);
-  }
-  .glow-green {
-    box-shadow: 0 0 25px -3px rgba(0, 255, 102, 0.5), inset 0 0 15px -3px rgba(0, 255, 102, 0.2);
-  }
-
-  /* Cyber HUD Corner Brackets */
-  .hud-bracket {
-    position: relative;
-  }
-  .hud-bracket::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    width: 10px;
-    height: 10px;
-    border-top: 2px solid #00f0ff;
-    border-left: 2px solid #00f0ff;
-    filter: drop-shadow(0 0 4px #00f0ff);
-  }
-  .hud-bracket::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 10px;
-    height: 10px;
-    border-bottom: 2px solid #ff0055;
-    border-right: 2px solid #ff0055;
-    filter: drop-shadow(0 0 4px #ff0055);
-  }
-
-  /* Cyber Perspective 3D Grid */
-  .retro-grid-perspective {
-    background-image: 
-      linear-gradient(to right, rgba(0, 240, 255, 0.15) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
-    background-size: 40px 40px;
-    transform: perspective(600px) rotateX(55deg);
-    transform-origin: center top;
-  }
-
-  /* CRT Scanlines */
-  .retro-scanlines {
-    background: linear-gradient(
-      rgba(18, 16, 16, 0) 50%, 
-      rgba(0, 0, 0, 0.22) 50%
-    ), linear-gradient(
-      90deg,
-      rgba(255, 0, 85, 0.03),
-      rgba(0, 240, 255, 0.02),
-      rgba(255, 230, 0, 0.02)
-    );
-    background-size: 100% 3px, 4px 100%;
-    pointer-events: none;
-  }
-
-  /* Telemetry Cyber Badge */
-  .telemetry-badge {
-    @apply font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-lg border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.2)];
-  }
-
-  /* Cyber Button */
-  .cyber-btn {
-    @apply relative overflow-hidden font-bold tracking-wider uppercase transition-all duration-200;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400;
   }
 
   .scrollbar-hide::-webkit-scrollbar {
@@ -213,20 +111,18 @@
   }
 }
 
-/* Neon Cyber Scrollbar */
+/* Clean Standard Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050814;
+  background: #0b0f19;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.35);
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  background: #243048;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff;
-  box-shadow: 0 0 15px #00f0ff;
+  background: #3b82f6;
 }

@@ -12,9 +12,6 @@ import {
   BookOpen,
   CalendarCheck,
   ChevronRight,
-  Terminal,
-  Cpu,
-  Zap,
 } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
@@ -33,74 +30,70 @@ type IntroProps = {
 const portals = [
   {
     role: 'admin' as const,
-    title: 'Admin Command Deck',
-    code: 'SYS.ADM-01',
-    desc: 'Manage institutional infrastructure, user credentials, telemetry feeds, classroom sensors, and cyber-security policies.',
+    title: 'Admin Portal',
+    code: 'ADMIN',
+    desc: 'Manage school operations, users, classroom cameras, security and platform analytics.',
     icon: ShieldCheck,
-    badgeClass: 'border-cyan-400/50 bg-cyan-500/10 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.2)]',
-    iconBg: 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/40 shadow-[0_0_20px_rgba(0,240,255,0.3)]',
-    btnClass: 'bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-400/50 hover:shadow-[0_0_15px_rgba(0,240,255,0.3)]',
-    glowHover: 'hover:border-cyan-400 hover:shadow-[0_0_35px_rgba(0,240,255,0.3)]',
+    badgeClass: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
+    iconBg: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
+    btnClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
   },
   {
     role: 'teacher' as const,
-    title: 'Teacher Neural Station',
-    code: 'EDU.TCH-02',
-    desc: 'Deploy AI quizzes, monitor classroom attention vectors, author interactive assignments, and review real-time student analytics.',
+    title: 'Teacher Portal',
+    code: 'TEACHER',
+    desc: 'Deploy AI quizzes, monitor classroom engagement, assign worksheets, and track student growth.',
     icon: GraduationCap,
-    badgeClass: 'border-pink-500/50 bg-pink-500/10 text-pink-300 shadow-[0_0_10px_rgba(255,0,85,0.2)]',
-    iconBg: 'bg-pink-500/20 text-pink-400 border border-pink-500/40 shadow-[0_0_20px_rgba(255,0,85,0.3)]',
-    btnClass: 'bg-pink-500/20 text-pink-300 hover:bg-pink-500/30 border border-pink-500/50 hover:shadow-[0_0_15px_rgba(255,0,85,0.3)]',
-    glowHover: 'hover:border-pink-500 hover:shadow-[0_0_35px_rgba(255,0,85,0.3)]',
+    badgeClass: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-400',
+    iconBg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20',
+    btnClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
   },
   {
     role: 'student' as const,
-    title: 'Student Learning Terminal',
-    code: 'LRN.STU-03',
-    desc: 'Answer assignments, take adaptive quizzes, review step-by-step AI solutions, explore video modules, and track study streaks.',
+    title: 'Student Portal',
+    code: 'STUDENT',
+    desc: 'Access interactive lessons, answer assignments, review evaluated solutions, and view exam reports.',
     icon: UserRound,
-    badgeClass: 'border-yellow-400/50 bg-yellow-500/10 text-yellow-300 shadow-[0_0_10px_rgba(255,230,0,0.2)]',
-    iconBg: 'bg-yellow-500/20 text-yellow-400 border border-yellow-400/40 shadow-[0_0_20px_rgba(255,230,0,0.3)]',
-    btnClass: 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 border border-yellow-400/50 hover:shadow-[0_0_15px_rgba(255,230,0,0.3)]',
-    glowHover: 'hover:border-yellow-400 hover:shadow-[0_0_35px_rgba(255,230,0,0.3)]',
+    badgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
+    iconBg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
+    btnClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
   },
   {
     role: 'parent' as const,
-    title: 'Parent Telemetry Portal',
-    code: 'COM.PAR-04',
-    desc: 'Real-time biometric attendance streams, assignment performance logs, teacher communication channels, and milestone reports.',
+    title: 'Parent Portal',
+    code: 'PARENT',
+    desc: 'Real-time attendance logs, assignment grades, teacher communication, and progress insights.',
     icon: Users,
-    badgeClass: 'border-emerald-400/50 bg-emerald-500/10 text-emerald-300 shadow-[0_0_10px_rgba(0,255,102,0.2)]',
-    iconBg: 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 shadow-[0_0_20px_rgba(0,255,102,0.3)]',
-    btnClass: 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/50 hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]',
-    glowHover: 'hover:border-emerald-400 hover:shadow-[0_0_35px_rgba(0,255,102,0.3)]',
+    badgeClass: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
+    iconBg: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
+    btnClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
   },
 ];
 
 const features = [
   {
     icon: Brain,
-    code: 'NEURAL.01',
-    title: 'Adaptive AI Engine',
-    desc: 'Deep learning models personalizing curriculum paths for maximum knowledge retention.',
+    code: 'AI.01',
+    title: 'AI Learning Tools',
+    desc: 'Personalized adaptive learning and smart recommendations for students.',
   },
   {
     icon: BarChart3,
-    code: 'METRIC.02',
-    title: 'Precision Telemetry',
-    desc: 'Sub-second metrics on quiz responses, focus levels, and conceptual mastery.',
+    code: 'ANALYTICS.02',
+    title: 'Performance Analytics',
+    desc: 'Real-time metrics for attendance, quiz progress, and subject mastery.',
   },
   {
     icon: CalendarCheck,
-    code: 'BIO.03',
-    title: 'Attendance Intelligence',
-    desc: 'Real-time facial verification & automated multi-channel parent alerts.',
+    code: 'ATTEND.03',
+    title: 'Smart Attendance',
+    desc: 'Automated attendance verification and instant notifications.',
   },
   {
     icon: BookOpen,
-    code: 'MATRIX.04',
-    title: 'Connected Cyber Matrix',
-    desc: 'Unified ecosystem bridging teachers, students, parents, and school leadership.',
+    code: 'CONNECT.04',
+    title: 'Unified Platform',
+    desc: 'Seamless collaboration between teachers, students, parents, and admins.',
   },
 ];
 
@@ -110,127 +103,92 @@ function IntroScreen({ onContinue }: IntroProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
-      transition={{ duration: 0.5 }}
-      className="relative min-h-screen overflow-hidden bg-[#050814]"
+      transition={{ duration: 0.4 }}
+      className="relative min-h-screen overflow-hidden bg-background"
     >
-      {/* 3D Perspective Grid Background */}
-      <div className="absolute inset-x-0 bottom-0 h-96 retro-grid-perspective opacity-35 pointer-events-none" />
-      <div className="absolute inset-0 retro-scanlines opacity-40 pointer-events-none" />
-
-      {/* Cyber Ambient Glow Lights */}
-      <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-cyan-500/20 blur-[150px] pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-pink-500/20 blur-[150px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-yellow-500/10 blur-[160px] pointer-events-none" />
-
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 py-16">
         {/* Logo */}
         <motion.div
-          initial={{ opacity: 0, y: -25 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-4"
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-3"
         >
-          <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-yellow-400 to-pink-500 p-[2px] shadow-[0_0_35px_rgba(0,240,255,0.5)]">
-            <div className="flex h-full w-full items-center justify-center rounded-2xl bg-[#090d22]">
-              <Cpu className="h-8 w-8 text-cyan-400 filter drop-shadow-[0_0_10px_#00f0ff]" />
-            </div>
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <GraduationCap className="h-7 w-7" />
           </div>
 
           <div>
-            <div className="font-display text-4xl font-black tracking-wider">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-yellow-300 to-pink-500">
-                EDU
-              </span>
-              <span className="text-white">SENSE</span>
+            <div className="text-3xl font-bold tracking-tight text-foreground">
+              EDUSense
             </div>
-
-            <p className="font-mono text-xs tracking-widest text-cyan-400/90 uppercase">
-              // CYBERNETIC TEACHING INTELLIGENCE • 2077
+            <p className="text-xs text-muted-foreground">
+              AI Teaching & Learning Platform
             </p>
           </div>
         </motion.div>
 
-        {/* Main Intro */}
+        {/* Main intro */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="mt-10 max-w-3xl text-center"
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="mt-8 max-w-2xl text-center"
         >
-          {/* Status Badge */}
-          <div className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-1.5 font-mono text-xs font-bold text-cyan-300 shadow-[0_0_20px_rgba(0,240,255,0.25)]">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
-            </span>
-            <Terminal className="h-3.5 w-3.5" />
-            STATUS: ONLINE // NEURAL_PLATFORM_V2.7
-          </div>
-
-          <h1 className="font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-            Cyberpunk Classroom.
-            <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-yellow-300 to-pink-500 drop-shadow-[0_0_25px_rgba(0,240,255,0.4)]">
-              Next-Gen Learning Matrix.
-            </span>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            Empowering modern education with AI intelligence.
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            EDUSense fuses real-time student engagement diagnostics, automated assignment grading, interactive
-            problem solvers, and biometric attendance into a unified cyber ecosystem.
+          <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
+            EDUSense provides automated assignment workflows, real-time analytics, and personalized learning support.
           </p>
         </motion.div>
 
-        {/* Feature Cards */}
+        {/* Feature cards */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="mt-10 grid w-full max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mt-10 grid w-full max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
-          {features.map((feature, index) => {
+          {features.map((feature) => {
             const Icon = feature.icon;
 
             return (
-              <motion.div
+              <div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className="group relative rounded-2xl border border-cyan-500/25 bg-[#0b0f24]/85 p-5 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/60 hover:shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:-translate-y-1"
+                className="rounded-xl border border-border/80 bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span className="font-mono text-[10px] text-cyan-400/60">{feature.code}</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
                 </div>
 
-                <h3 className="mt-4 font-display text-sm font-bold text-foreground group-hover:text-cyan-300 transition-colors">
+                <h3 className="mt-3 text-sm font-semibold text-foreground">
                   {feature.title}
                 </h3>
 
-                <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{feature.desc}</p>
-              </motion.div>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                  {feature.desc}
+                </p>
+              </div>
             );
           })}
         </motion.div>
 
         {/* Primary CTA */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="mt-12"
+          transition={{ delay: 0.45, duration: 0.4 }}
+          className="mt-10"
         >
           <button
             type="button"
             onClick={onContinue}
-            className="group relative inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-300 to-yellow-300 px-8 py-4 font-display text-sm font-black tracking-wider text-slate-950 shadow-[0_0_30px_rgba(0,240,255,0.5)] transition-all hover:scale-105 hover:shadow-[0_0_45px_rgba(0,240,255,0.8)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
           >
-            <Zap className="h-5 w-5 fill-current text-slate-950" />
-            <span>ENTER CYBER PLATFORM</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
+            <span>Get Started</span>
+            <ArrowRight className="h-4 w-4" />
           </button>
         </motion.div>
       </div>
@@ -267,145 +225,95 @@ export default function PortalSelector({
       ) : (
         <motion.div
           key="portals"
-          initial={{ opacity: 0, x: 60 }}
+          initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -60 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="relative min-h-screen overflow-hidden bg-[#050814]"
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+          className="relative min-h-screen bg-background"
         >
-          {/* Background Grid */}
-          <div className="absolute inset-x-0 bottom-0 h-96 retro-grid-perspective opacity-30 pointer-events-none" />
-          <div className="absolute inset-0 retro-scanlines opacity-40 pointer-events-none" />
-
-          {/* Ambient Lighting */}
-          <div className="absolute -top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-cyan-500/20 blur-[150px] pointer-events-none" />
-          <div className="absolute -bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-pink-500/20 blur-[150px] pointer-events-none" />
-
-          <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 py-16">
+          <div className="relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 py-16">
             {/* Back Button */}
-            <motion.button
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
+            <button
+              type="button"
               onClick={() => setShowPortals(false)}
-              className="absolute left-6 top-6 flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-[#0b0f24]/90 px-4 py-2 font-mono text-xs text-cyan-300 transition hover:border-cyan-400 hover:bg-cyan-500/15 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)]"
+              className="absolute left-6 top-6 flex items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
             >
               <ChevronRight className="h-4 w-4 rotate-180" />
-              BACK TO MATRIX
-            </motion.button>
+              Back
+            </button>
 
             {/* Logo */}
-            <motion.div
-              initial={{ opacity: 0, y: -15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mb-4 flex items-center gap-3"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-yellow-400 to-pink-500 p-[2px] shadow-[0_0_25px_rgba(0,240,255,0.4)]">
-                <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#090d22]">
-                  <Cpu className="h-6 w-6 text-cyan-400" />
-                </div>
+            <div className="mb-3 flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <GraduationCap className="h-5 w-5" />
               </div>
-
-              <span className="font-display text-3xl font-black tracking-wide">
-                <span className="text-gradient">EDU</span>SENSE
+              <span className="text-2xl font-bold tracking-tight text-foreground">
+                EDUSense
               </span>
-            </motion.div>
+            </div>
 
             {/* Heading */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="text-center"
-            >
-              <p className="mb-2 font-mono text-xs uppercase tracking-widest text-cyan-400/90 font-bold">
-                [ AUTHENTICATION GATEWAY // SELECT ACCESS PROFILE ]
-              </p>
-
-              <h1 className="font-display text-3xl font-extrabold sm:text-4xl text-white">
-                Choose Access Terminal
+            <div className="text-center">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                Select your portal
               </h1>
-
-              <p className="mx-auto mt-2.5 max-w-xl text-sm text-muted-foreground sm:text-base">
-                Select your designated role to initialize your session, or launch Instant Demo Mode for evaluation.
+              <p className="mt-1 text-sm text-muted-foreground">
+                Choose your role to log in or use the quick demo preview.
               </p>
-            </motion.div>
+            </div>
 
             {/* Portal Cards */}
-            <div className="mt-9 grid w-full gap-5 sm:grid-cols-2">
-              {portals.map((portal, index) => {
+            <div className="mt-8 grid w-full gap-4 sm:grid-cols-2">
+              {portals.map((portal) => {
                 const Icon = portal.icon;
 
                 return (
-                  <motion.div
+                  <Card
                     key={portal.role}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 + index * 0.1 }}
+                    className="flex flex-col justify-between rounded-xl border border-border/80 bg-card p-6 shadow-sm transition hover:border-border hover:shadow-md"
                   >
-                    <Card
-                      className={cn(
-                        'hud-bracket group relative h-full overflow-hidden p-6 transition-all duration-300 bg-[#0b0f24]/90 border border-cyan-500/30 backdrop-blur-xl',
-                        portal.glowHover
-                      )}
-                    >
-                      {/* Main portal click */}
-                      <button type="button" onClick={() => onSelect(portal.role)} className="w-full text-left">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${portal.iconBg}`}>
-                            <Icon className="h-6 w-6" />
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <span className={`font-mono text-[10px] px-2.5 py-1 rounded-md border font-bold ${portal.badgeClass}`}>
-                              {portal.code}
-                            </span>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" />
-                          </div>
+                    <div>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${portal.iconBg}`}>
+                          <Icon className="h-6 w-6" />
                         </div>
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${portal.badgeClass}`}>
+                          {portal.code}
+                        </span>
+                      </div>
 
-                        <h2 className="mt-5 font-display text-xl font-bold tracking-wide text-foreground group-hover:text-white transition-colors">
-                          {portal.title}
-                        </h2>
+                      <h2 className="mt-4 text-lg font-bold text-foreground">
+                        {portal.title}
+                      </h2>
 
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{portal.desc}</p>
+                      <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                        {portal.desc}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center pt-2">
+                      <button
+                        type="button"
+                        onClick={() => onSelect(portal.role)}
+                        className={`flex flex-1 items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold transition ${portal.btnClass}`}
+                      >
+                        Sign In
                       </button>
 
-                      {/* Actions */}
-                      <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                        <button
-                          type="button"
-                          onClick={() => onSelect(portal.role)}
-                          className={`flex flex-1 items-center justify-center rounded-xl px-4 py-2.5 font-display text-xs font-bold tracking-wider transition ${portal.btnClass}`}
-                        >
-                          Access Terminal
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDemoLogin(portal.role)}
-                          className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-pink-500/40 bg-pink-500/10 px-4 py-2.5 font-display text-xs font-bold tracking-wider text-pink-300 transition hover:bg-pink-500/20 hover:border-pink-500/70 hover:shadow-[0_0_20px_rgba(255,0,85,0.3)]"
-                        >
-                          <Sparkles className="h-3.5 w-3.5 text-pink-400" />
-                          Demo Bypass
-                        </button>
-                      </div>
-                    </Card>
-                  </motion.div>
+                      <button
+                        type="button"
+                        onClick={() => handleDemoLogin(portal.role)}
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                      >
+                        <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                        Quick Demo
+                      </button>
+                    </div>
+                  </Card>
                 );
               })}
             </div>
-
-            {/* Demo Note */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mt-8 flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[#0b0f24]/90 px-4 py-1.5 font-mono text-xs text-cyan-300 backdrop-blur shadow-[0_0_20px_rgba(0,240,255,0.2)]"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-yellow-400 animate-pulse" />
-              <span>NEURAL SIMULATION // Demo Bypass Enabled for All Roles</span>
-            </motion.div>
           </div>
         </motion.div>
       )}

@@ -977,44 +977,44 @@ export default function StudentDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl border border-cyan-500/25 bg-gradient-to-r from-cyan-950/40 via-card/90 to-blue-950/30 p-6 sm:p-7 shadow-[0_0_40px_rgba(0,210,255,0.1)]"
+        className="rounded-2xl border border-border/80 bg-card p-6 sm:p-7 shadow-sm"
       >
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="mb-2 inline-flex items-center gap-2 rounded-full bg-cyan-500/15 border border-cyan-500/30 px-3.5 py-1 text-xs font-semibold text-cyan-300">
-              <GraduationCap className="h-3.5 w-3.5 text-cyan-400" />
-              Student Learning Hub • 2026
+            <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-0.5 text-xs font-semibold text-primary">
+              <GraduationCap className="h-3.5 w-3.5" />
+              Student Learning Hub
             </p>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-display">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               Welcome, {defaultData.student.name}
             </h1>
 
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-1.5 text-sm text-muted-foreground">
               {defaultData.student.className} • Section {defaultData.student.section} • Roll No.{' '}
-              <span className="font-mono text-cyan-300">{defaultData.student.rollNumber}</span>
+              <span className="font-mono text-foreground font-semibold">{defaultData.student.rollNumber}</span>
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             {pendingCount > 0 && (
-              <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 min-w-[160px] animate-pulse">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 min-w-[150px]">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                   <AlertCircle className="h-3.5 w-3.5" /> Action Required
                 </p>
-                <p className="mt-1 text-2xl font-black text-amber-300">
+                <p className="mt-1 text-2xl font-bold text-amber-400">
                   {pendingCount} {pendingCount === 1 ? 'Assignment' : 'Assignments'}
                 </p>
-                <p className="text-xs text-amber-200/80">Pending to answer</p>
+                <p className="text-xs text-muted-foreground">Pending to answer</p>
               </div>
             )}
 
-            <div className="rounded-2xl border border-border/70 bg-card/80 p-4 min-w-[140px]">
+            <div className="rounded-xl border border-border/80 bg-muted/20 p-3.5 min-w-[140px]">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Attendance</p>
               <p className="mt-1 text-2xl font-bold text-foreground">
                 {defaultData.attendance.present} / {defaultData.attendance.totalClasses}
               </p>
-              <p className="text-xs text-emerald-400">{defaultData.attendance.percentage}% Present</p>
+              <p className="text-xs text-emerald-500">{defaultData.attendance.percentage}% Present</p>
             </div>
           </div>
         </div>
@@ -1045,14 +1045,14 @@ export default function StudentDashboard() {
       {/* ===================================================
           FEATURED: ASSIGNMENTS & QUIZZES HUB
       =================================================== */}
-      <Card className="border-cyan-500/30 bg-card/80 shadow-[0_0_30px_rgba(0,210,255,0.06)]">
+      <Card className="border-border/80 bg-card shadow-sm">
         <CardHeader className="flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-5">
           <div>
             <div className="flex items-center gap-2">
-              <div className="rounded-xl bg-cyan-500/15 p-2 text-cyan-400 border border-cyan-500/30">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
                 <ClipboardList className="h-5 w-5" />
               </div>
-              <CardTitle className="text-xl sm:text-2xl font-bold font-display">Assignments & Quizzes</CardTitle>
+              <CardTitle className="text-xl font-bold">Assignments & Quizzes</CardTitle>
             </div>
             <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
               Answer assignments given by your teachers, take AI quizzes, and review evaluated solutions.
@@ -1066,10 +1066,10 @@ export default function StudentDashboard() {
               size="sm"
               onClick={() => setStatusFilter('all')}
               className={cn(
-                'rounded-xl text-xs font-semibold gap-1.5',
+                'rounded-lg text-xs font-semibold gap-1.5',
                 statusFilter === 'all'
-                  ? 'bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400'
-                  : 'border-border/70 text-muted-foreground'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'border-border text-muted-foreground hover:text-foreground'
               )}
             >
               All ({allAssignments.length})
@@ -1080,10 +1080,10 @@ export default function StudentDashboard() {
               size="sm"
               onClick={() => setStatusFilter('pending')}
               className={cn(
-                'rounded-xl text-xs font-semibold gap-1.5',
+                'rounded-lg text-xs font-semibold gap-1.5',
                 statusFilter === 'pending'
-                  ? 'bg-amber-500 text-slate-950 font-bold hover:bg-amber-400'
-                  : 'border-amber-500/40 text-amber-300 hover:bg-amber-500/10'
+                  ? 'bg-amber-500 text-white hover:bg-amber-600'
+                  : 'border-amber-500/30 text-amber-500 hover:bg-amber-500/10'
               )}
             >
               <AlertCircle className="h-3.5 w-3.5" />
@@ -1095,10 +1095,10 @@ export default function StudentDashboard() {
               size="sm"
               onClick={() => setStatusFilter('completed')}
               className={cn(
-                'rounded-xl text-xs font-semibold gap-1.5',
+                'rounded-lg text-xs font-semibold gap-1.5',
                 statusFilter === 'completed'
-                  ? 'bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400'
-                  : 'border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10'
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10'
               )}
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
@@ -1116,7 +1116,7 @@ export default function StudentDashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search assignments by title, topic, or teacher..."
-                className="pl-10 rounded-xl border-border/60 bg-muted/20 text-sm focus:border-cyan-400"
+                className="pl-10 rounded-lg border-border bg-muted/20 text-sm focus:border-primary"
               />
             </div>
 
@@ -1130,10 +1130,10 @@ export default function StudentDashboard() {
                   type="button"
                   onClick={() => setSubjectFilter(sub)}
                   className={cn(
-                    'rounded-lg px-2.5 py-1 text-xs font-medium transition-all',
+                    'rounded-md px-2.5 py-1 text-xs font-medium transition-all',
                     subjectFilter.toLowerCase() === sub.toLowerCase()
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                      : 'bg-muted/20 text-muted-foreground hover:text-foreground border border-transparent'
+                      ? 'bg-primary text-primary-foreground font-semibold'
+                      : 'bg-muted/30 text-muted-foreground hover:text-foreground border border-transparent'
                   )}
                 >
                   {sub === 'all' ? 'All Subjects' : sub}
@@ -1144,7 +1144,7 @@ export default function StudentDashboard() {
 
           {/* Assignments Grid */}
           {filteredAssignments.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/60 p-10 text-center space-y-3">
+            <div className="rounded-xl border border-dashed border-border/80 p-10 text-center space-y-3">
               <ClipboardList className="mx-auto h-10 w-10 text-muted-foreground/60" />
               <p className="font-semibold text-foreground">No assignments match your filter</p>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto">
@@ -1166,16 +1166,15 @@ export default function StudentDashboard() {
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredAssignments.map((assignment) => {
                 const isCompleted = assignment.status === 'submitted' || assignment.status === 'graded';
-                const hasScore = assignment.score !== undefined && assignment.percentage !== undefined;
 
                 return (
                   <div
                     key={assignment.id}
                     className={cn(
-                      'group relative flex flex-col justify-between rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl',
+                      'group relative flex flex-col justify-between rounded-xl border p-5 transition hover:border-border hover:shadow-md',
                       isCompleted
-                        ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/50'
-                        : 'border-cyan-500/30 bg-[#0c1228] hover:border-cyan-400 hover:shadow-[0_0_25px_rgba(0,210,255,0.15)]'
+                        ? 'border-emerald-500/20 bg-emerald-950/10'
+                        : 'border-border/80 bg-card'
                     )}
                   >
                     <div>
@@ -1184,55 +1183,55 @@ export default function StudentDashboard() {
                         <Badge
                           variant="outline"
                           className={cn(
-                            'text-xs font-semibold',
+                            'text-xs font-medium',
                             assignment.subject === 'Mathematics'
-                              ? 'border-blue-500/40 text-blue-400 bg-blue-500/10'
+                              ? 'border-blue-500/30 text-blue-400 bg-blue-500/10'
                               : assignment.subject === 'Computer Science'
-                              ? 'border-cyan-500/40 text-cyan-300 bg-cyan-500/10'
+                              ? 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10'
                               : assignment.subject === 'Science'
-                              ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10'
-                              : 'border-purple-500/40 text-purple-400 bg-purple-500/10'
+                              ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10'
+                              : 'border-purple-500/30 text-purple-400 bg-purple-500/10'
                           )}
                         >
                           {assignment.subject}
                         </Badge>
 
                         {isCompleted ? (
-                          <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[11px] font-semibold gap-1">
+                          <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-[11px] font-medium gap-1">
                             <Check className="h-3 w-3" /> Graded {assignment.percentage}%
                           </Badge>
                         ) : (
-                          <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[11px] font-semibold animate-pulse">
+                          <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[11px] font-medium">
                             To Answer
                           </Badge>
                         )}
                       </div>
 
                       {/* Title & Topic */}
-                      <h3 className="font-bold text-base text-foreground leading-snug group-hover:text-cyan-300 transition-colors">
+                      <h3 className="font-bold text-base text-foreground leading-snug">
                         {assignment.title}
                       </h3>
 
-                      <p className="mt-1.5 text-xs text-muted-foreground line-clamp-1">
-                        Topic: <span className="text-foreground/90 font-medium">{assignment.topic}</span>
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
+                        Topic: <span className="text-foreground font-medium">{assignment.topic}</span>
                       </p>
 
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Assigned by <span className="text-cyan-300 font-medium">{assignment.teacherName}</span>
+                        Assigned by <span className="text-foreground font-medium">{assignment.teacherName}</span>
                       </p>
 
                       {/* Meta Pills */}
                       <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground border-t border-border/40 pt-3">
                         <span className="flex items-center gap-1">
-                          <Layers className="h-3.5 w-3.5 text-cyan-400" />
+                          <Layers className="h-3.5 w-3.5 text-primary" />
                           {assignment.questions?.length || 5} Questions
                         </span>
                         <span className="flex items-center gap-1">
-                          <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                          <Trophy className="h-3.5 w-3.5 text-amber-500" />
                           {assignment.totalMarks} Marks
                         </span>
-                        <span className="flex items-center gap-1 font-medium text-foreground/80">
-                          <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="flex items-center gap-1 font-medium text-muted-foreground">
+                          <CalendarDays className="h-3.5 w-3.5" />
                           {assignment.dueDate}
                         </span>
                       </div>
@@ -1243,7 +1242,7 @@ export default function StudentDashboard() {
                       {isCompleted ? (
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">Score Achieved:</span>
+                            <span className="text-muted-foreground">Score:</span>
                             <span className="font-bold text-emerald-400 font-mono">
                               {assignment.score} / {assignment.totalMarks} ({assignment.grade})
                             </span>
@@ -1252,7 +1251,7 @@ export default function StudentDashboard() {
                           <div className="flex gap-2">
                             <Button
                               onClick={() => handleOpenAssignment(assignment, 'review')}
-                              className="flex-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold"
+                              className="flex-1 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 text-xs font-semibold"
                               size="sm"
                             >
                               <FileText className="mr-1.5 h-3.5 w-3.5" />
@@ -1263,7 +1262,7 @@ export default function StudentDashboard() {
                               variant="outline"
                               onClick={() => handleOpenAssignment(assignment, 'answering')}
                               size="sm"
-                              className="border-border/60 hover:bg-white/5 text-xs text-muted-foreground"
+                              className="border-border text-xs text-muted-foreground hover:text-foreground"
                               title="Retake for practice"
                             >
                               <RotateCcw className="h-3.5 w-3.5" />
@@ -1273,11 +1272,11 @@ export default function StudentDashboard() {
                       ) : (
                         <Button
                           onClick={() => handleOpenAssignment(assignment, 'answering')}
-                          className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-[0_0_15px_rgba(0,210,255,0.3)] group-hover:shadow-[0_0_20px_rgba(0,210,255,0.5)] transition-all"
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs transition-all shadow-sm"
                           size="sm"
                         >
                           <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-                          Answer Assignment Now
+                          Answer Assignment
                           <ChevronRight className="ml-auto h-4 w-4" />
                         </Button>
                       )}
