@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   GraduationCap,
   UserRound,
+  Terminal,
+  KeyRound,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,52 +23,62 @@ export type LoginRole = PortalRole;
 type RoleInfo = {
   title: string;
   subtitle: string;
+  code: string;
   label: string;
   placeholder: string;
   icon: typeof ShieldCheck;
   demoId: string;
   demoPassword: string;
+  accentColor: string;
 };
 
 const roleInfo: Record<LoginRole, RoleInfo> = {
   admin: {
-    title: 'Admin Dashboard',
-    subtitle: 'Secure administrator access',
-    label: 'Admin ID',
-    placeholder: 'Enter admin ID',
+    title: 'Admin Command',
+    subtitle: 'SECURE_CLEARANCE: LEVEL_4_ACCESS',
+    code: 'SYS.ADM-01',
+    label: 'ADMIN_IDENTIFIER',
+    placeholder: 'Enter admin ID (admin001)',
     icon: ShieldCheck,
     demoId: 'admin001',
     demoPassword: 'Admin@123',
+    accentColor: 'cyan',
   },
 
   teacher: {
-    title: 'Teacher Dashboard',
-    subtitle: 'Secure teacher access',
-    label: 'Teacher ID',
-    placeholder: 'Enter teacher ID',
+    title: 'Teacher Console',
+    subtitle: 'EDUCATOR_ACCESS: VERIFIED_CHANNEL',
+    code: 'EDU.TCH-02',
+    label: 'FACULTY_ID',
+    placeholder: 'Enter teacher ID (teacher001)',
     icon: GraduationCap,
     demoId: 'teacher001',
     demoPassword: 'EduSense@123',
+    accentColor: 'magenta',
   },
 
   student: {
-    title: 'Student Dashboard',
-    subtitle: 'Secure student access',
-    label: 'Student Roll Number',
-    placeholder: 'Enter roll number',
+    title: 'Student Terminal',
+    subtitle: 'ACADEMIC_PORT: ROLL_AUTHENTICATION',
+    code: 'LRN.STU-03',
+    label: 'STUDENT_ROLL_NO',
+    placeholder: 'Enter roll number (SNIST10A042)',
     icon: UserRound,
     demoId: 'SNIST10A042',
     demoPassword: 'Student@123',
+    accentColor: 'emerald',
   },
 
   parent: {
-    title: 'Parent Dashboard',
-    subtitle: 'Student verification login',
-    label: 'Student Roll Number',
-    placeholder: 'Enter child roll number',
+    title: 'Parent Portal',
+    subtitle: 'PARENT_CHANNEL: OTP_VERIFICATION',
+    code: 'COM.PAR-04',
+    label: 'STUDENT_ROLL_NO',
+    placeholder: 'Enter child roll number (SNIST10A042)',
     icon: UserRound,
     demoId: 'SNIST10A042',
     demoPassword: '123456',
+    accentColor: 'amber',
   },
 };
 
@@ -97,7 +109,7 @@ export default function RoleLogin({
     }
 
     setOtpSent(true);
-    toast.success('Demo OTP sent successfully. Use 123456');
+    toast.success('Demo OTP transmission active: 123456');
   };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -123,13 +135,13 @@ export default function RoleLogin({
         localStorage.setItem('vidya_auth_name', 'Aarav Reddy (Parent)');
         localStorage.setItem('vidya_authenticated', 'true');
 
-        toast.success('Parent Login Successful');
+        toast.success('Parent Access Granted');
         setLoading(false);
         onSuccess('parent');
         return;
       }
 
-      toast.error('Invalid Student Details or OTP. Hint: SNIST10A042, Aarav Reddy, OTP: 123456');
+      toast.error('ACCESS DENIED: Check Roll (SNIST10A042), Name (Aarav Reddy), OTP (123456)');
       setLoading(false);
       return;
     }
@@ -142,7 +154,7 @@ export default function RoleLogin({
       enteredPassword === info.demoPassword;
 
     if (!validCredentials) {
-      toast.error('Invalid login credentials.');
+      toast.error('AUTHENTICATION FAILED: Invalid credentials.');
       setLoading(false);
       return;
     }
@@ -152,7 +164,7 @@ export default function RoleLogin({
     localStorage.setItem('vidya_auth_name', info.title);
     localStorage.setItem('vidya_authenticated', 'true');
 
-    toast.success('Login successful');
+    toast.success('Access Authorized // System Online');
     setLoading(false);
     onSuccess(role);
   };
@@ -165,18 +177,24 @@ export default function RoleLogin({
       : password.length === 0);
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-12">
-      <div className="absolute inset-0 bg-grid-pattern bg-[size:50px_50px] opacity-[0.07]" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#070814] px-6 py-12">
+      {/* 3D Horizon Grid Background */}
+      <div className="absolute inset-x-0 bottom-0 h-96 retro-grid-perspective opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 retro-scanlines opacity-40 pointer-events-none" />
+
+      {/* Cyber Lights */}
+      <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-cyan-500/15 blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-pink-500/15 blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
         <Button
           type="button"
           variant="ghost"
           onClick={onBack}
-          className="mb-5 gap-2"
+          className="mb-5 gap-2 font-mono text-xs text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to portals
+          // ABORT TO PORTALS
         </Button>
 
         <motion.div
@@ -184,17 +202,22 @@ export default function RoleLogin({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="glass overflow-hidden">
+          <Card className="glass hud-bracket overflow-hidden border-cyan-500/30 shadow-[0_0_40px_rgba(0,240,255,0.15)]">
             <CardHeader className="pb-4 text-center">
-              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,240,255,0.3)]">
                 <Icon className="h-7 w-7" />
               </div>
 
-              <CardTitle className="text-2xl">
+              <div className="inline-flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-400/80 mb-1">
+                <Terminal className="h-3 w-3" />
+                {info.code} // AUTH_GATEWAY
+              </div>
+
+              <CardTitle className="font-display text-2xl font-bold tracking-wide text-foreground">
                 {info.title}
               </CardTitle>
 
-              <p className="text-sm text-muted-foreground">
+              <p className="font-mono text-xs text-muted-foreground">
                 {info.subtitle}
               </p>
             </CardHeader>
@@ -204,27 +227,29 @@ export default function RoleLogin({
                 {role === 'parent' ? (
                   <>
                     <div className="space-y-2">
-                      <label htmlFor="student-roll" className="text-sm font-medium">
-                        Student Roll Number
+                      <label htmlFor="student-roll" className="font-mono text-xs uppercase tracking-wider text-cyan-300">
+                        // Student Roll Number
                       </label>
                       <Input
                         id="student-roll"
                         value={identifier}
                         onChange={(e) => setIdentifier(e.target.value)}
-                        placeholder="Enter Student Roll Number (e.g. SNIST10A042)"
+                        placeholder="SNIST10A042"
+                        className="font-mono border-cyan-500/30 bg-[#0c0e1f]/80 focus-visible:ring-cyan-400 focus-visible:border-cyan-400"
                         disabled={loading}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="student-name" className="text-sm font-medium">
-                        Student Name
+                      <label htmlFor="student-name" className="font-mono text-xs uppercase tracking-wider text-cyan-300">
+                        // Student Full Name
                       </label>
                       <Input
                         id="student-name"
                         value={studentName}
                         onChange={(e) => setStudentName(e.target.value)}
-                        placeholder="Enter Student Name (e.g. Aarav Reddy)"
+                        placeholder="Aarav Reddy"
+                        className="font-mono border-cyan-500/30 bg-[#0c0e1f]/80 focus-visible:ring-cyan-400 focus-visible:border-cyan-400"
                         disabled={loading}
                       />
                     </div>
@@ -232,36 +257,51 @@ export default function RoleLogin({
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full"
+                      className="w-full font-display text-xs tracking-wider border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400"
                       onClick={sendOtp}
                       disabled={loading || !identifier.trim()}
                     >
-                      {otpSent ? 'Resend OTP' : 'Send OTP'}
+                      {otpSent ? 'TRANSMIT NEW OTP' : 'GENERATE VERIFICATION OTP'}
                     </Button>
 
                     {otpSent && (
-                      <div className="space-y-2">
-                        <label htmlFor="otp-input" className="text-sm font-medium">
-                          OTP Verification
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="space-y-2"
+                      >
+                        <label htmlFor="otp-input" className="font-mono text-xs uppercase tracking-wider text-pink-300">
+                          // Enter 6-Digit OTP Code
                         </label>
                         <Input
                           id="otp-input"
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
-                          placeholder="Enter 6-digit OTP (123456)"
+                          placeholder="123456"
                           maxLength={6}
+                          className="font-mono text-center tracking-[0.3em] text-lg border-pink-500/40 bg-[#0c0e1f]/90 text-pink-300 focus-visible:ring-pink-400 focus-visible:border-pink-400"
                           disabled={loading}
                         />
-                      </div>
+                      </motion.div>
                     )}
 
-                    <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-muted-foreground">
-                      <div className="font-semibold text-foreground mb-1">
-                        Demo Parent Credentials
+                    <div className="rounded-xl border border-cyan-500/30 bg-[#090b1c]/80 p-3.5 font-mono text-xs text-muted-foreground shadow-[inset_0_0_15px_rgba(0,240,255,0.05)]">
+                      <div className="flex items-center gap-1.5 font-bold text-cyan-400 mb-1.5">
+                        <KeyRound className="h-3.5 w-3.5" />
+                        [ DEMO_PARENT_CREDENTIALS ]
                       </div>
-                      <div>Roll No: <span className="font-mono font-medium text-foreground">SNIST10A042</span></div>
-                      <div>Student: <span className="font-mono font-medium text-foreground">Aarav Reddy</span></div>
-                      <div>OTP: <span className="font-mono font-medium text-foreground">123456</span></div>
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span>ROLL_NO:</span>
+                        <span className="text-foreground font-semibold">SNIST10A042</span>
+                      </div>
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span>STUDENT:</span>
+                        <span className="text-foreground font-semibold">Aarav Reddy</span>
+                      </div>
+                      <div className="flex justify-between py-0.5">
+                        <span>DEV_OTP:</span>
+                        <span className="text-pink-400 font-semibold">123456</span>
+                      </div>
                     </div>
                   </>
                 ) : (
@@ -270,9 +310,9 @@ export default function RoleLogin({
                     <div className="space-y-2">
                       <label
                         htmlFor="identifier"
-                        className="text-sm font-medium"
+                        className="font-mono text-xs uppercase tracking-wider text-cyan-300"
                       >
-                        {info.label}
+                        // {info.label}
                       </label>
 
                       <Input
@@ -281,6 +321,7 @@ export default function RoleLogin({
                         onChange={(e) => setIdentifier(e.target.value)}
                         placeholder={info.placeholder}
                         autoComplete="username"
+                        className="font-mono border-cyan-500/30 bg-[#0c0e1f]/80 focus-visible:ring-cyan-400 focus-visible:border-cyan-400"
                         disabled={loading}
                       />
                     </div>
@@ -289,9 +330,9 @@ export default function RoleLogin({
                     <div className="space-y-2">
                       <label
                         htmlFor="password"
-                        className="text-sm font-medium"
+                        className="font-mono text-xs uppercase tracking-wider text-cyan-300"
                       >
-                        Password
+                        // SECURITY_KEY
                       </label>
 
                       <div className="relative">
@@ -300,7 +341,7 @@ export default function RoleLogin({
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="pr-11"
+                          className="pr-11 font-mono border-cyan-500/30 bg-[#0c0e1f]/80 focus-visible:ring-cyan-400 focus-visible:border-cyan-400"
                           autoComplete="current-password"
                           disabled={loading}
                         />
@@ -310,7 +351,7 @@ export default function RoleLogin({
                           onClick={() =>
                             setShowPassword((current) => !current)
                           }
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/70 hover:text-cyan-300 transition-colors"
                           aria-label={
                             showPassword
                               ? 'Hide password'
@@ -327,24 +368,20 @@ export default function RoleLogin({
                     </div>
 
                     {/* Demo credentials */}
-                    <div className="rounded-xl border border-border/50 bg-muted/30 p-3 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-2 font-medium text-foreground">
-                        <LockKeyhole className="h-4 w-4" />
-                        Demo credentials
+                    <div className="rounded-xl border border-cyan-500/30 bg-[#090b1c]/80 p-3.5 font-mono text-xs text-muted-foreground shadow-[inset_0_0_15px_rgba(0,240,255,0.05)]">
+                      <div className="flex items-center gap-1.5 font-bold text-cyan-400 mb-1.5">
+                        <LockKeyhole className="h-3.5 w-3.5" />
+                        [ DEMO_AUTHENTICATION ]
                       </div>
 
-                      <div className="mt-1">
-                        ID:{' '}
-                        <span className="font-mono">
-                          {info.demoId}
-                        </span>
+                      <div className="flex justify-between py-0.5 border-b border-white/5">
+                        <span>USER_ID:</span>
+                        <span className="text-foreground font-semibold">{info.demoId}</span>
+                      </div>
 
-                        {' · '}
-
-                        Password:{' '}
-                        <span className="font-mono">
-                          {info.demoPassword}
-                        </span>
+                      <div className="flex justify-between py-0.5">
+                        <span>PASSWORD:</span>
+                        <span className="text-pink-400 font-semibold">{info.demoPassword}</span>
                       </div>
                     </div>
                   </>
@@ -353,11 +390,11 @@ export default function RoleLogin({
                 {/* Login Button */}
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full font-display text-xs font-bold tracking-wider uppercase bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-pink-500 text-white shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] transition disabled:opacity-50"
                   disabled={isSubmitDisabled}
                 >
                   <LogIn className="mr-2 h-4 w-4" />
-                  {loading ? 'Signing in...' : 'Login'}
+                  {loading ? 'AUTHENTICATING...' : 'AUTHORIZE LOGIN'}
                 </Button>
               </form>
             </CardContent>

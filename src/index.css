@@ -4,35 +4,55 @@
 
 @layer base {
   :root {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 16%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 40% 16%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 189 94% 43%;
+    /* Retro Futurism Theme: Deep Void Space + Electric Cyber Neon */
+    --background: 245 45% 6%;         /* #070814 */
+    --foreground: 210 100% 98%;        /* #f5f8ff */
+    --card: 245 40% 9%;               /* #0c0e1f */
+    --card-foreground: 210 100% 98%;
+    --popover: 245 40% 9%;
+    --popover-foreground: 210 100% 98%;
+
+    /* Neon Electric Cyan */
+    --primary: 185 100% 50%;          /* #00f0ff */
+    --primary-foreground: 245 45% 6%;
+
+    /* Deep Indigo / Cyber Slate */
+    --secondary: 245 35% 15%;         /* #181b33 */
+    --secondary-foreground: 185 100% 90%;
+
+    /* Muted Slate */
+    --muted: 245 30% 13%;             /* #141629 */
+    --muted-foreground: 225 25% 65%;  /* #8b95b8 */
+
+    /* Laser Hot Magenta / Synth Pink */
+    --accent: 335 100% 58%;           /* #ff2a85 */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --border: 222 40% 20%;
-    --input: 222 40% 20%;
-    --ring: 217 91% 60%;
-    --chart-1: 217 91% 60%;
-    --chart-2: 189 94% 43%;
-    --chart-3: 142 71% 45%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 280 65% 65%;
-    --radius: 0.75rem;
+
+    /* Cyber Laser Red */
+    --destructive: 350 95% 60%;       /* #ff3355 */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Phosphor Matrix Emerald */
+    --success: 157 100% 50%;          /* #00ff9d */
+    --success-foreground: 245 45% 6%;
+
+    /* Solar Synth Amber */
+    --warning: 42 100% 50%;           /* #ffb400 */
+    --warning-foreground: 245 45% 6%;
+
+    /* Neon Borders & Rings */
+    --border: 245 35% 20%;            /* #222648 */
+    --input: 245 35% 18%;
+    --ring: 185 100% 50%;             /* #00f0ff */
+
+    /* Data Visualization / Charts */
+    --chart-1: 185 100% 50%;          /* Electric Cyan */
+    --chart-2: 335 100% 58%;          /* Laser Magenta */
+    --chart-3: 157 100% 50%;          /* Matrix Emerald */
+    --chart-4: 42 100% 50%;           /* Solar Amber */
+    --chart-5: 275 100% 65%;          /* Hyper Violet */
+
+    --radius: 0.85rem;
   }
 }
 
@@ -44,32 +64,120 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-background text-foreground selection:bg-primary/30 selection:text-primary;
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image: 
+      radial-gradient(ellipse 80% 80% at 50% -20%, rgba(0, 240, 255, 0.12), transparent 70%),
+      radial-gradient(ellipse 60% 60% at 90% 80%, rgba(255, 0, 127, 0.08), transparent 70%),
+      radial-gradient(ellipse 50% 50% at 10% 90%, rgba(0, 255, 157, 0.06), transparent 70%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
 @layer utilities {
+  /* Retro Futurism Glass Panels with Cyan & Magenta Neon Rim */
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    @apply bg-[#0c0e1f]/75 backdrop-blur-xl border border-cyan-500/20 shadow-[0_8px_32px_rgba(0,0,0,0.6)];
+  }
+  .glass:hover {
+    @apply border-cyan-500/40 shadow-[0_0_25px_rgba(0,240,255,0.15)];
   }
   .glass-strong {
-    @apply bg-white/10 backdrop-blur-2xl border border-white/15;
+    @apply bg-[#0e1126]/90 backdrop-blur-2xl border border-cyan-400/30 shadow-[0_0_30px_rgba(0,240,255,0.2)];
   }
+  .glass-magenta {
+    @apply bg-[#150a1e]/80 backdrop-blur-xl border border-pink-500/30 shadow-[0_0_25px_rgba(255,0,127,0.15)];
+  }
+
+  /* Holographic Gradients */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-pink-500;
+  }
+  .text-gradient-cyan {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-teal-300 to-emerald-400;
   }
   .text-gradient-accent {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400;
   }
+  .text-gradient-amber {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-orange-400 to-pink-500;
+  }
+
+  /* Neon Glow Effects */
   .glow-primary {
-    box-shadow: 0 0 40px -10px hsl(var(--primary) / 0.5);
+    box-shadow: 0 0 30px -5px rgba(0, 240, 255, 0.6);
   }
   .glow-accent {
-    box-shadow: 0 0 40px -10px hsl(var(--accent) / 0.5);
+    box-shadow: 0 0 30px -5px rgba(255, 0, 127, 0.6);
   }
+  .glow-emerald {
+    box-shadow: 0 0 30px -5px rgba(0, 255, 157, 0.6);
+  }
+  .glow-amber {
+    box-shadow: 0 0 30px -5px rgba(255, 180, 0, 0.6);
+  }
+
+  /* Tech HUD Card Corner Accents */
+  .hud-bracket {
+    position: relative;
+  }
+  .hud-bracket::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid hsl(var(--primary));
+    border-left: 2px solid hsl(var(--primary));
+  }
+  .hud-bracket::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-bottom: 2px solid hsl(var(--accent));
+    border-right: 2px solid hsl(var(--accent));
+  }
+
+  /* 3D Synthwave Horizon Grid */
+  .retro-grid-perspective {
+    background-image: 
+      linear-gradient(to right, rgba(0, 240, 255, 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(600px) rotateX(45deg);
+    transform-origin: center top;
+  }
+
+  /* Subtle CRT Scanline overlay */
+  .retro-scanlines {
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%, 
+      rgba(0, 0, 0, 0.25) 50%
+    ), linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.03),
+      rgba(0, 255, 0, 0.01),
+      rgba(0, 0, 255, 0.03)
+    );
+    background-size: 100% 3px, 4px 100%;
+    pointer-events: none;
+  }
+
+  /* Monospace Telemetry Badge */
+  .telemetry-badge {
+    @apply font-mono text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-md border border-cyan-500/30 bg-cyan-500/10 text-cyan-300;
+  }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -79,41 +187,20 @@
   }
 }
 
-@keyframes particle-float {
-  0% {
-    transform: translateY(0) translateX(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100vh) translateX(50px);
-    opacity: 0;
-  }
-}
-
-.particle {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, hsl(var(--primary) / 0.8), hsl(var(--accent) / 0.4));
-  pointer-events: none;
-}
-
+/* Neon Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: #070814;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 5px;
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5);
+  background: rgba(0, 240, 255, 0.7);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
 }
