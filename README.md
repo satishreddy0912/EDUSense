@@ -1,4 +1,4 @@
-# Vidya AI — Full Stack Hackathon Build
+# EDUSense — Full Stack Hackathon Build
 
 This build keeps the existing Vidya AI UI/UX and adds the backend/data/AI layer.
 
